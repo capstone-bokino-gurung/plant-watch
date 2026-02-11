@@ -9,10 +9,17 @@ import { Image } from "expo-image";
 import { useRef, useState } from "react";
 import { Button, Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
+import { LoadingSpinner } from '@/components/loading-spin';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 
 export default function ScanScreen() {
+  const screens = {
+    CAMERA: "camera",
+    SCAN_PREVIEW: "scanPreview",
+    SCAN_PROCESSING: "scanProcessing",
+    SCAN_HISTORY: "scanHistory",
+  };
   const [permission, requestPermission] = useCameraPermissions();
   const ref = useRef<CameraView>(null);
   const [uri, setUri] = useState<string | undefined>(undefined);
@@ -41,25 +48,14 @@ export default function ScanScreen() {
     const photo = await ref.current?.takePictureAsync();
     if (photo?.uri) {
       setUri(photo.uri);
-      setScreenScanPreview();
+      setScreen(screens.SCAN_PREVIEW);
     }
   };
 
-  const setScreenScanHis = () => {
-    setScreen("scanHistory");
+  const submitScan = async () => {
+    setScreen(screens.SCAN_PROCESSING);
   }
 
-  const setScreenCam = () => {
-    setScreen("camera");
-  }
-
-  const setScreenScanPreview = () => {
-    setScreen("scanPreview")
-  }
-
-  const screenScanResult = (scanId: string) => {
-    //TODO
-  }
 
   const screenEmpty = () => {
     return (<ThemedView></ThemedView>);
@@ -100,7 +96,7 @@ export default function ScanScreen() {
           </Pressable>
         </ThemedView>
         <ThemedView style={styles.scanHistoryButtonContainer}>
-          <Pressable onPress={setScreenScanHis}>
+          <Pressable onPress={() => {setScreen(screens.SCAN_HISTORY)}}>
 
           </Pressable>
         </ThemedView>
@@ -113,7 +109,7 @@ export default function ScanScreen() {
     <ThemedView style={styles.scanImageContainer}>
       <TouchableOpacity 
         style={styles.backButton}
-        onPress={setScreenCam}
+        onPress={() => {setScreen(screens.CAMERA)}}
       >
         <Text style={{fontSize: 24, color: "#ffffff"}}>←</Text>
       </TouchableOpacity>
@@ -124,10 +120,7 @@ export default function ScanScreen() {
       />
       <TouchableOpacity 
         style={styles.submitButton}
-        onPress={() => {
-          // Handle submit logic here
-          console.log('Submit scan pressed');
-        }}
+        onPress={submitScan}
       >
         <Text style={styles.submitButtonText}> Submit Scan </Text>
       </TouchableOpacity>
@@ -135,7 +128,13 @@ export default function ScanScreen() {
     );
   }
 
-  const renderProcessingScan = () => {
+  const renderScanProcessing = () => {
+    return (
+      <ThemedView style={styles.centeredContainer}>
+        <ThemedText style={{paddingBottom: 5, fontWeight: 600}}>Processing...</ThemedText>
+        <LoadingSpinner />
+      </ThemedView>
+    );
 
   }
 
@@ -143,10 +142,12 @@ export default function ScanScreen() {
 
   }
 
-  if (currScreen === "scanHistory") {
+  if (currScreen === screens.SCAN_HISTORY) {
 
-  } else if (currScreen === "scanPreview") {
+  } else if (currScreen === screens.SCAN_PREVIEW) {
     return renderScanPreview();
+  } else if (currScreen === screens.SCAN_PROCESSING) {
+    return renderScanProcessing();
   } else { // Default to camera
     return focused ? renderCamera() : screenEmpty();
   }
