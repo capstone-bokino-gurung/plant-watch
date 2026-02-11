@@ -1,26 +1,25 @@
+import { useIsFocused } from '@react-navigation/native';
 import {
   CameraMode,
   CameraType,
   CameraView,
   useCameraPermissions,
 } from "expo-camera";
+import { Image } from "expo-image";
 import { useRef, useState } from "react";
-import { Button, Pressable, Platform, StyleSheet } from 'react-native';
-import { ThemeContext, useIsFocused } from '@react-navigation/native';
+import { Button, Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
-import { rgbaColor } from "react-native-reanimated/lib/typescript/Colors";
 
 export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const ref = useRef<CameraView>(null);
-  const [uri, setUri] = useState<string | null>(null);
+  const [uri, setUri] = useState<string | undefined>(undefined);
   const [mode, setMode] = useState<CameraMode>("picture");
   const [facing, setFacing] = useState<CameraType>("back");
   const focused = useIsFocused();
-  let currScreen = "camera";
+  const [currScreen, setScreen] = useState("camera");
 
   if (!permission) {
     return null;
@@ -39,16 +38,23 @@ export default function ScanScreen() {
 
   // example logic, rework
   const takePicture = async () => {
-    // const photo = await ref.current?.takePictureAsync();
-    // if (photo?.uri) setUri(photo.uri);
+    const photo = await ref.current?.takePictureAsync();
+    if (photo?.uri) {
+      setUri(photo.uri);
+      setScreenScanPreview();
+    }
   };
 
   const setScreenScanHis = () => {
-    currScreen = "scanHistory";
+    setScreen("scanHistory");
   }
 
-  const setScreenCam = (screen: string) => {
-    currScreen = "camera";
+  const setScreenCam = () => {
+    setScreen("camera");
+  }
+
+  const setScreenScanPreview = () => {
+    setScreen("scanPreview")
   }
 
   const screenScanResult = (scanId: string) => {
@@ -102,6 +108,33 @@ export default function ScanScreen() {
     );
   };
 
+  const renderScanPreview = () => {
+    return (
+    <ThemedView style={styles.scanImageContainer}>
+      <TouchableOpacity 
+        style={styles.backButton}
+        onPress={setScreenCam}
+      >
+        <Text style={{fontSize: 24, color: "#ffffff"}}>←</Text>
+      </TouchableOpacity>
+      <Image 
+        source = {{ uri }}
+        contentFit = "cover"
+        style = {styles.scanImage}
+      />
+      <TouchableOpacity 
+        style={styles.submitButton}
+        onPress={() => {
+          // Handle submit logic here
+          console.log('Submit scan pressed');
+        }}
+      >
+        <Text style={styles.submitButtonText}> Submit Scan </Text>
+      </TouchableOpacity>
+    </ThemedView>
+    );
+  }
+
   const renderProcessingScan = () => {
 
   }
@@ -112,6 +145,8 @@ export default function ScanScreen() {
 
   if (currScreen === "scanHistory") {
 
+  } else if (currScreen === "scanPreview") {
+    return renderScanPreview();
   } else { // Default to camera
     return focused ? renderCamera() : screenEmpty();
   }
@@ -128,6 +163,46 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  scanImageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    
+  },
+  scanImage: {
+    width: '80%',
+    height: '70%',
+    borderRadius: 20,
+    borderWidth: 3,
+    borderColor: '#1c4415'
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#1c4415',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  submitButton: {
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: '#1c4415',
+    marginHorizontal: 20,
+    marginBottom: 40,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   stepContainer: {
     gap: 8,
     marginBottom: 8,
@@ -136,9 +211,10 @@ const styles = StyleSheet.create({
   camera: StyleSheet.absoluteFillObject,
   scanHistoryButtonContainer: {
     position: "absolute",
-    top: 20,
-    backgroundColor: "transparent",
+    bottom: 40,
     left: 20,
+    right: 20,
+    backgroundColor: "transparent",
     width: "100%",
     flexDirection: "row",
     paddingHorizontal: 30,
