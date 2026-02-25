@@ -2,12 +2,12 @@ import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { View } from 'react-native';
+import { LoginScreen } from '@/components/login-screen'
 
 export default function Profile() {
   return (
-    <ThemedView style={styles.centeredContainer}>
-      <ThemedText>W.I.P.</ThemedText>
-    </ThemedView>
+    <LoginScreen/>
   );
 }
 
