@@ -1,3 +1,8 @@
+import { LoadingSpinner } from '@/components/loading-spin';
+import { ScanResults } from '@/components/scan-results';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { BackButton } from '@/components/ui/back-button';
 import { useIsFocused } from '@react-navigation/native';
 import {
   CameraMode,
@@ -8,13 +13,7 @@ import {
 import { Image } from "expo-image";
 import { SaveFormat, useImageManipulator } from 'expo-image-manipulator';
 import { useRef, useState } from "react";
-import { Button, Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native';
-
-import { LoadingSpinner } from '@/components/loading-spin';
-import { ScanResults } from '@/components/scan-results';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { BackButton } from '@/components/ui/back-button';
+import { Alert, Button, Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import { scan_plant } from '@/hooks/scanPlant';
 
@@ -82,8 +81,14 @@ export default function ScanScreen() {
 
     await reformat_image();
     const scanResults = await scan_plant(uri);
-    setScanResults(scanResults);
-    setScreen(screens.SCAN_RESULTS);
+    if (!scanResults.error) {
+      setScanResults(scanResults.data);
+      setScreen(screens.SCAN_RESULTS);
+    } else {
+      setScreen(screens.CAMERA);
+      Alert.alert("Identification Failed", "The A.I. failed to identify the plant. Please try scanning the plant again in better lighting or at a different angle.");
+    }
+    
   }
 
 
