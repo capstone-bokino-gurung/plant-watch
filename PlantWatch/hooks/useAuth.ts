@@ -5,7 +5,7 @@ import { Alert } from 'react-native'
 interface UseAuthReturn {
   loading: boolean
   signInWithEmail: (email: string, password: string) => Promise<void>
-  signUpWithEmail: (email: string, password: string) => Promise<void>
+  signUpWithEmail: (email: string, password: string, first_name: string, last_name: string) => Promise<void>
 }
 
 export function useAuth(): UseAuthReturn {
@@ -26,11 +26,13 @@ export function useAuth(): UseAuthReturn {
 
   const signUpWithEmail = async (
     email: string,
-    password: string
+    password: string,
+    first_name: string,
+    last_name: string
   ): Promise<void> => {
     setLoading(true)
 
-    const { session, error } = await signUp(email, password)
+    const { session, error } = await signUp(email, password, first_name, last_name)
 
     if (error) Alert.alert(error.message)
     if (!session) Alert.alert('Check your email for verification.')

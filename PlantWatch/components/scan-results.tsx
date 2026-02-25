@@ -1,6 +1,8 @@
 import { Image } from 'expo-image';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
 
 interface ScanResultsProps {
   imageUri: string;
@@ -12,46 +14,46 @@ interface ScanResultsProps {
   description: string;
 }
 
-// TODO: Rework to use themedview OR consider the use of themed view at all in the project?
+// TODO: Rework to use themedThemedView OR consider the use of themed ThemedView at all in the project?
 // Ask client if dark/light mode is important
 
 export function ScanResults({ imageUri, commonName, scientificName, genus, family, confidenceScore, description }: ScanResultsProps) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.topSection}>
+      <ThemedView style={styles.topSection}>
         <Image
           source={{ uri: imageUri }}
           style={styles.image}
           contentFit="cover"
         />
         
-        <View style={styles.infoRows}>
-          <View style={styles.row}>
-            <Text style={styles.label}>Common Name:</Text>
-            <Text style={styles.value}>{commonName}</Text>
-          </View>
+        <ThemedView style={styles.infoRows}>
+          <ThemedView style={styles.row}>
+            <ThemedText style={styles.label}>Common Name:</ThemedText>
+            <ThemedText style={styles.value}>{commonName}</ThemedText>
+          </ThemedView>
           
-          <View style={styles.row}>
-            <Text style={styles.label}>Genus:</Text>
-            <Text style={styles.value}>{genus}</Text>
-          </View>
+          <ThemedView style={styles.row}>
+            <ThemedText style={styles.label}>Genus:</ThemedText>
+            <ThemedText style={styles.value}>{genus}</ThemedText>
+          </ThemedView>
           
-          <View style={styles.row}>
-            <Text style={styles.label}>Family:</Text>
-            <Text style={styles.value}>{family}</Text>
-          </View>
-        </View>
-      </View>
+          <ThemedView style={styles.row}>
+            <ThemedText style={styles.label}>Family:</ThemedText>
+            <ThemedText style={styles.value}>{family}</ThemedText>
+          </ThemedView>
+        </ThemedView>
+      </ThemedView>
       
 
-      <View style={styles.descriptionContainer}>
-        <Text style={styles.descriptionLabel}>AI Confidence Score:</Text>
-        <Text style={styles.descriptionText}>{confidenceScore}</Text>
-        <Text style={styles.descriptionLabel}>Scientific Name:</Text>
-        <Text style={styles.descriptionText}>{scientificName}</Text>
-        <Text style={styles.descriptionLabel}>Additional information:</Text>
-        <Text style={styles.descriptionText}>{description}</Text>
-      </View>
+      <ThemedView style={styles.descriptionContainer}>
+        <ThemedText style={styles.descriptionLabel}>AI Confidence Score:</ThemedText>
+        <ThemedText style={styles.descriptionText}>{confidenceScore}</ThemedText>
+        <ThemedText style={styles.descriptionLabel}>Scientific Name:</ThemedText>
+        <ThemedText style={styles.descriptionText}>{scientificName}</ThemedText>
+        <ThemedText style={styles.descriptionLabel}>Additional information:</ThemedText>
+        <ThemedText style={styles.descriptionText}>{description}</ThemedText>
+      </ThemedView>
     </ScrollView>
   );
 };
@@ -59,7 +61,7 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
   },
   contentContainer: {
     padding: 20,
@@ -69,6 +71,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 24,
     height: 180,
+    borderRadius: 12
   },
   image: {
     width: 120,
@@ -98,7 +101,6 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   descriptionContainer: {
-    backgroundColor: '#f8f8f8',
     borderRadius: 12,
     padding: 18,
     minHeight: 150,
@@ -114,7 +116,6 @@ const styles = StyleSheet.create({
   descriptionText: {
     fontSize: 16,
     lineHeight: 24,
-    color: '#333333',
     marginBottom: 5
   },
 });

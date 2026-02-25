@@ -14,6 +14,7 @@ import { LoadingSpinner } from '@/components/loading-spin';
 import { ScanResults } from '@/components/scan-results';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { BackButton } from '@/components/ui/back-button';
 
 import { scan_plant } from '@/hooks/scanPlant';
 
@@ -34,6 +35,7 @@ export default function ScanScreen() {
   const focused = useIsFocused();
   const [currScreen, setScreen] = useState("camera");
   const [scanResults, setScanResults] = useState<Record<string, string>>({});
+  const scanContext = useImageManipulator(uri ?? '');
 
   if (!permission) {
     return null;
@@ -64,9 +66,7 @@ export default function ScanScreen() {
   const reformat_image = async () => {
     // need to touch up what happens if this fails
     if (uri == undefined) return;
-
-    const context = useImageManipulator(uri);
-    const renderedImage = await context.renderAsync();
+    const renderedImage = await scanContext.renderAsync();
     const result = await renderedImage.saveAsync({
       base64: true,
       compress: 0.9,
@@ -80,7 +80,7 @@ export default function ScanScreen() {
     setScreen(screens.SCAN_PROCESSING);
     if (uri == undefined) return;
 
-    reformat_image();
+    await reformat_image();
     const scanResults = await scan_plant(uri);
     setScanResults(scanResults);
     setScreen(screens.SCAN_RESULTS);
@@ -137,12 +137,13 @@ export default function ScanScreen() {
   const render_scan_preview = () => {
     return (
     <ThemedView style={styles.scanImageContainer}>
-      <TouchableOpacity 
+      <BackButton onPress={() => setScreen(screens.CAMERA)}/>
+      {/* <TouchableOpacity 
         style={styles.backButton}
         onPress={() => {setScreen(screens.CAMERA)}}
       >
         <Text style={{fontSize: 24, color: "#ffffff"}}>←</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <Image 
         source = {{ uri }}
         contentFit = "cover"
