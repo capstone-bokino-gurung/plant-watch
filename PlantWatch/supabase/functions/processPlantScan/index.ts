@@ -10,7 +10,6 @@ const PLANTNET_API_URL = `https://my-api.plantnet.org/v2/identify/all?api-key=${
 
 Deno.serve(async (req) => {
   try {
-    console.log("on server");
     const formData = await req.formData();
     const imageFile = formData.get('image') as File;
       
@@ -23,6 +22,8 @@ Deno.serve(async (req) => {
 
     const plantScannerForm = new FormData();  
     plantScannerForm.append('images', imageFile);
+    plantScannerForm.append('nb-results', String(1)); // Limit API results to 1
+
     
     const response = await fetch(PLANTNET_API_URL, {
       method: 'POST',
@@ -31,20 +32,27 @@ Deno.serve(async (req) => {
 
     const result = await response.json();
 
-    const bestMatch = result.results[0];
-    let reformattedResult: Record<string, string> = {
-      commonName: bestMatch.species.commonNames[0],
-      genus: bestMatch.species.genus.scientificName,
-      family: bestMatch.species.family.scientificName,
-      scientificName: bestMatch.species.scientificNameWithoutAuthor,
-      confidenceScore: String(bestMatch.score)
-    };
-    
+    if (result.results.length == 1) {
+      const bestMatch = result.results[0];
+      let reformattedResult: Record<string, string> = {
+        commonName: bestMatch.species.commonNames[0],
+        genus: bestMatch.species.genus.scientificName,
+        family: bestMatch.species.family.scientificName,
+        scientificName: bestMatch.species.scientificNameWithoutAuthor,
+        confidenceScore: String(bestMatch.score)
+      };
+      
+      return new Response(JSON.stringify(reformattedResult), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } else { // Assume the request failed
+      return new Response(null, {
+        status: 204
+      })
+    }
 
-    
-    return new Response(JSON.stringify(reformattedResult), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
