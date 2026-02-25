@@ -13,15 +13,13 @@ import { ThemedView } from '@/components/themed-view';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { useAuth } from '@/hooks/useAuth';
 
-interface LoginScreenProps {
-  createAccountOnPress?: () => void;
-}
-
-export function LoginScreen({ createAccountOnPress }: LoginScreenProps) {
+export function RegisterScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [first_name, setFirstName] = useState('');
+    const [last_name, setLastName] = useState('');
 
-    const { signInWithEmail, loading } = useAuth()
+    const { signInWithEmail, signUpWithEmail, loading } = useAuth()
     return (
     <KeyboardAvoidingView
         style={styles.container}
@@ -45,6 +43,24 @@ export function LoginScreen({ createAccountOnPress }: LoginScreenProps) {
           />
           <TextInput
               style={styles.input}
+              placeholder="First Name"
+              placeholderTextColor="#aaa"
+              value={email}
+              onChangeText={setFirstName}
+              autoCapitalize="words"
+              keyboardType="default"
+          />
+          <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              placeholderTextColor="#aaa"
+              value={email}
+              onChangeText={setLastName}
+              autoCapitalize="words"
+              keyboardType="default"
+          />
+          <TextInput
+              style={styles.input}
               placeholder="Password"
               placeholderTextColor="#aaa"
               value={password}
@@ -52,23 +68,11 @@ export function LoginScreen({ createAccountOnPress }: LoginScreenProps) {
               secureTextEntry
           />
 
-          <TouchableOpacity style={styles.loginButton} onPress={() => {signInWithEmail(email, password)}} disabled={loading}>
-            <ThemedText style={styles.loginButtonText}>Log In</ThemedText>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => {/* navigate to forgot password */}}>
-            <ThemedText style={styles.forgotPassword}>Forgot password?</ThemedText>
+          <TouchableOpacity style={styles.registerButton} onPress={() => {signUpWithEmail(email, password, first_name, last_name)}} disabled={loading}>
+            <ThemedText style={styles.registerButtonText}>Register</ThemedText>
           </TouchableOpacity>
 
 
-      </ThemedView>
-
-      {/* Footer */}
-        <ThemedView style={styles.footer}>
-        <ThemedText style={styles.footerText}>Need an account? </ThemedText>
-        <TouchableOpacity onPress={createAccountOnPress}>
-            <ThemedText style={styles.footerLink}>Create account.</ThemedText>
-        </TouchableOpacity>
       </ThemedView>
     </KeyboardAvoidingView>
     );
@@ -94,20 +98,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     color: '#000',
   },
-  forgotPassword: {
-    color: ThemeColors.link,
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 10,
-  },
-  loginButton: {
+  registerButton: {
     backgroundColor: ThemeColors.button,
     borderRadius: 10,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 24,
   },
-  loginButtonText: {
+  registerButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
