@@ -15,11 +15,19 @@ export async function signIn(
 
 export async function signUp(
   email: string,
-  password: string
+  password: string,
+  first_name: string,
+  last_name: string
 ): Promise<{ session: Session | null; error: AuthError | null }> {
   const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
+    email: email,
+    password: password,
+    options: {
+        data: {
+            first_name: first_name,
+            last_name: last_name
+        }
+    }
   })
 
   return { session: data.session, error }
