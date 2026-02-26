@@ -18,7 +18,10 @@ export async function scan_plant(uri: string) {
             body: formData,
         });
 
-        return await response.json();
+        if (response.ok)
+            return {data: await response.json()};
+        console.log("Identification failed.");
+        return {data: null, error: "Identification failed."};
     } catch (error) {
         console.error('Plant scan error:', error);
         return { 

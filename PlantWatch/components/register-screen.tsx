@@ -45,7 +45,7 @@ export function RegisterScreen() {
               style={styles.input}
               placeholder="First Name"
               placeholderTextColor="#aaa"
-              value={email}
+              value={first_name}
               onChangeText={setFirstName}
               autoCapitalize="words"
               keyboardType="default"
@@ -54,7 +54,7 @@ export function RegisterScreen() {
               style={styles.input}
               placeholder="Last Name"
               placeholderTextColor="#aaa"
-              value={email}
+              value={last_name}
               onChangeText={setLastName}
               autoCapitalize="words"
               keyboardType="default"
