@@ -16,6 +16,9 @@ import { useRef, useState } from "react";
 import { Alert, Button, Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import { scan_plant } from '@/hooks/scanPlant';
+import { useAuth } from '@/hooks/useAuth';
+import { PlantScanResult } from '@/interfaces/plant';
+import { logScan } from '@/services/plant';
 
 export default function ScanScreen() {
   const screens = {
@@ -33,8 +36,9 @@ export default function ScanScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const focused = useIsFocused();
   const [currScreen, setScreen] = useState("camera");
-  const [scanResults, setScanResults] = useState<Record<string, string>>({});
+  const [scanResults, setScanResults] = useState<PlantScanResult | {}>({});
   const scanContext = useImageManipulator(uri ?? '');
+  const { session, user } = useAuth();
 
   if (!permission) {
     return null;
@@ -44,7 +48,7 @@ export default function ScanScreen() {
     return (
       <ThemedView style={styles.centeredContainer}>
         <ThemedText style={{ textAlign: "center" }}>
-          We need your permission to use the camera
+          We need your permission to use the camera.
         </ThemedText>
         <Button onPress={request_permission} title="Grant permission" />
       </ThemedView>
@@ -80,15 +84,16 @@ export default function ScanScreen() {
     if (uri == undefined) return;
 
     await reformat_image();
-    const scanResults = await scan_plant(uri);
-    if (!scanResults.error) {
-      setScanResults(scanResults.data);
+    const scanResponse = await scan_plant(uri);
+    if (!scanResponse.error) {
+      setScanResults(scanResponse.data);
+      if (session && user)
+        logScan(user.id, uri, scanResponse.data as PlantScanResult);
       setScreen(screens.SCAN_RESULTS);
     } else {
       setScreen(screens.CAMERA);
       Alert.alert("Identification Failed", "The A.I. failed to identify the plant. Please try scanning the plant again in better lighting or at a different angle.");
     }
-    
   }
 
 
@@ -183,6 +188,7 @@ export default function ScanScreen() {
   }
 
   const render_scan_results = () => {
+    let scan = scanResults as PlantScanResult;
     return (
       <ThemedView style={{flex: 1}}>
         <TouchableOpacity 
@@ -194,11 +200,11 @@ export default function ScanScreen() {
 
         <ScanResults 
           imageUri={uri? uri : "placeholder image here"}
-          commonName={scanResults.commonName}
-          scientificName={scanResults.scientificName}
-          genus={scanResults.genus}
-          family={scanResults.family}
-          confidenceScore={scanResults.confidenceScore}
+          commonName={scan.commonName}
+          scientificName={scan.scientificName}
+          genus={scan.genus}
+          family={scan.family}
+          confidenceScore={scan.confidenceScore}
           description='testing'
         />
         
