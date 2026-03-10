@@ -1,4 +1,5 @@
 import { LoadingSpinner } from '@/components/loading-spin';
+import { ScanHistory } from '@/components/scan-history';
 import { ScanResults } from '@/components/scan-results';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -96,6 +97,19 @@ export default function ScanScreen() {
     }
   }
 
+  const setScanFromHistory = (scan: any) => {
+    setUri(scan.scan_img_url);
+    setScanResults({
+        imageUri: scan.scan_img_uri,
+        commonName: scan.common_name,
+        scientificName: scan.scientific_name,
+        genus: scan.genus,
+        family: scan.family,
+        confidenceScore: String(scan.confidence_score),
+        description: 'placeholder'
+    } as PlantScanResult);
+  }
+
 
   const render_empty = () => {
     return (<ThemedView></ThemedView>);
@@ -104,6 +118,10 @@ export default function ScanScreen() {
   const render_camera = () => {
     return (
       <ThemedView style={styles.cameraContainer}>
+        <TouchableOpacity style={[styles.scanHistoryButton, {display: (session && user) ? 'flex' : 'none'}]} onPress={() => {setScreen(screens.SCAN_HISTORY)}}>
+          <Text style={{fontSize: 16, color: "#ffffff"}}>Scan History</Text>
+        </TouchableOpacity>
+
         <CameraView
           style={styles.camera}
           ref={ref}
@@ -148,12 +166,6 @@ export default function ScanScreen() {
     return (
     <ThemedView style={styles.scanImageContainer}>
       <BackButton onPress={() => setScreen(screens.CAMERA)}/>
-      {/* <TouchableOpacity 
-        style={styles.backButton}
-        onPress={() => {setScreen(screens.CAMERA)}}
-      >
-        <Text style={{fontSize: 24, color: "#ffffff"}}>←</Text>
-      </TouchableOpacity> */}
       <Image 
         source = {{ uri }}
         contentFit = "cover"
@@ -191,13 +203,7 @@ export default function ScanScreen() {
     let scan = scanResults as PlantScanResult;
     return (
       <ThemedView style={{flex: 1}}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => {setScreen(screens.CAMERA)}}
-        >
-          <Text style={{fontSize: 24, color: "#ffffff"}}>←</Text>
-        </TouchableOpacity>
-
+        <BackButton onPress={() => setScreen(screens.CAMERA)}/>
         <ScanResults 
           imageUri={uri? uri : "placeholder image here"}
           commonName={scan.commonName}
@@ -212,8 +218,20 @@ export default function ScanScreen() {
     );
   }
 
+  const render_scan_history = () => {
+    return (
+      <ThemedView style={{flex: 1}}>
+        <BackButton onPress={() => setScreen(screens.CAMERA)}/>
+        <ScanHistory onScanPress={(scan) => {
+          setScanFromHistory(scan);
+          setScreen(screens.SCAN_RESULTS);
+        }}/>
+      </ThemedView>
+    );
+  }
+
   if (currScreen === screens.SCAN_HISTORY) {
-  
+    return render_scan_history();
   } else if (currScreen === screens.LOADING) {
     return render_loading();
   } else if (currScreen === screens.SCAN_PREVIEW) {
@@ -321,4 +339,17 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 50,
   },
+
+  scanHistoryButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    width: 120,
+    height: 34,
+    zIndex: 10,
+    borderRadius: 22,
+    backgroundColor: '#1c4415',
+    justifyContent: 'center',
+    alignItems: 'center',
+},
 });

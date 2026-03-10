@@ -12,6 +12,7 @@ export const Colors = {
   light: {
     text: '#11181C',
     background: '#fff',
+    darkerBackground: '#f2f2f2',
     inputBackground: '#d8d8d8',
     tint: tintColorLight,
     icon: '#687076',
@@ -23,6 +24,7 @@ export const Colors = {
   dark: {
     text: '#ECEDEE',
     background: '#151718',
+    darkerBackground: '#121414',
     inputBackground: '#242729',
     tint: tintColorDark,
     icon: '#9BA1A6',

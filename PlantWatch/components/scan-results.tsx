@@ -1,8 +1,9 @@
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { ThemeColors } from '@/hooks/get-theme-colors';
 import { Image } from 'expo-image';
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 
 interface ScanResultsProps {
   imageUri: string;
@@ -61,7 +62,6 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
   },
   contentContainer: {
     padding: 20,
@@ -71,7 +71,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 24,
     height: 180,
-    borderRadius: 12
+    borderRadius: 12,
+    backgroundColor: ThemeColors.darkerBackground
   },
   image: {
     width: 120,
@@ -82,10 +83,12 @@ const styles = StyleSheet.create({
   infoRows: {
     flex: 1,
     justifyContent: 'space-between',
+    backgroundColor: '#ffffff00'
   },
   row: {
     flex: 1,
     justifyContent: 'center',
+    backgroundColor: '#ffffff00'
   },
   label: {
     fontSize: 13,
@@ -98,12 +101,12 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#000000',
   },
   descriptionContainer: {
     borderRadius: 12,
     padding: 18,
     minHeight: 150,
+    backgroundColor: ThemeColors.darkerBackground
   },
   descriptionLabel: {
     fontSize: 13,

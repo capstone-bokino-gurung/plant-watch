@@ -52,6 +52,18 @@ async function getOldestScanId(userId: string) {
     return data.scan_id;
 }
 
+export async function getScans(userId: string) {
+    const { data, error } = await supabase
+        .from(SCAN_HISTORY_TABLE)
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+    if (error) throw new Error(`Failed to get user scans: ${error.message}`);
+    
+    return data;
+}
+
 export async function deleteScan(userId: string, scanId: string) {
     const { data, error: fetchError } = await supabase
         .from(SCAN_HISTORY_TABLE)
