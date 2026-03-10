@@ -10,7 +10,7 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.greeting}>Hi there,</ThemedText>
-      <ThemedText style={styles.subtitle}>What would you like to do today?</ThemedText>
+      <ThemedText style={styles.subtitle}>Click below to access the Greenhouse Portal.</ThemedText>
 
       <TouchableOpacity style={styles.button} onPress={() => router.push('/greenhouse')}>
         <ThemedText style={styles.buttonText}>Greenhouse Portal</ThemedText>
@@ -30,15 +30,17 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 16,
     //alignItems: "center",
+    paddingTop: 60,
+    paddingBottom: 60,
     justifyContent: "center",
   },
   greeting: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: "bold",
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     opacity: 0.7,
     marginBottom: 32
   },
