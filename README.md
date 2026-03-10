@@ -1,4 +1,4 @@
-# CS496- Senior Capston Project
+# CS496- Senior Capstone Project
 CS496 Senior Capstone Project
 
 User Stories spreadsheet:
