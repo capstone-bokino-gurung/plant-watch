@@ -1,4 +1,5 @@
 import { LoadingSpinner } from '@/components/loading-spin';
+import { ScanHistory } from '@/components/scan-history';
 import { ScanResults } from '@/components/scan-results';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -16,6 +17,9 @@ import { useRef, useState } from "react";
 import { Alert, Button, Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import { scan_plant } from '@/hooks/scanPlant';
+import { useAuth } from '@/hooks/useAuth';
+import { PlantScanResult } from '@/interfaces/plant';
+import { logScan } from '@/services/plant';
 
 export default function ScanScreen() {
   const screens = {
@@ -33,8 +37,9 @@ export default function ScanScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const focused = useIsFocused();
   const [currScreen, setScreen] = useState("camera");
-  const [scanResults, setScanResults] = useState<Record<string, string>>({});
+  const [scanResults, setScanResults] = useState<PlantScanResult | {}>({});
   const scanContext = useImageManipulator(uri ?? '');
+  const { session, user } = useAuth();
 
   if (!permission) {
     return null;
@@ -44,7 +49,7 @@ export default function ScanScreen() {
     return (
       <ThemedView style={styles.centeredContainer}>
         <ThemedText style={{ textAlign: "center" }}>
-          We need your permission to use the camera
+          We need your permission to use the camera.
         </ThemedText>
         <Button onPress={request_permission} title="Grant permission" />
       </ThemedView>
@@ -80,15 +85,29 @@ export default function ScanScreen() {
     if (uri == undefined) return;
 
     await reformat_image();
-    const scanResults = await scan_plant(uri);
-    if (!scanResults.error) {
-      setScanResults(scanResults.data);
+    const scanResponse = await scan_plant(uri);
+    if (!scanResponse.error) {
+      setScanResults(scanResponse.data);
+      if (session && user)
+        logScan(user.id, uri, scanResponse.data as PlantScanResult);
       setScreen(screens.SCAN_RESULTS);
     } else {
       setScreen(screens.CAMERA);
       Alert.alert("Identification Failed", "The A.I. failed to identify the plant. Please try scanning the plant again in better lighting or at a different angle.");
     }
-    
+  }
+
+  const setScanFromHistory = (scan: any) => {
+    setUri(scan.scan_img_url);
+    setScanResults({
+        imageUri: scan.scan_img_uri,
+        commonName: scan.common_name,
+        scientificName: scan.scientific_name,
+        genus: scan.genus,
+        family: scan.family,
+        confidenceScore: String(scan.confidence_score),
+        description: 'placeholder'
+    } as PlantScanResult);
   }
 
 
@@ -99,6 +118,10 @@ export default function ScanScreen() {
   const render_camera = () => {
     return (
       <ThemedView style={styles.cameraContainer}>
+        <TouchableOpacity style={[styles.scanHistoryButton, {display: (session && user) ? 'flex' : 'none'}]} onPress={() => {setScreen(screens.SCAN_HISTORY)}}>
+          <Text style={{fontSize: 16, color: "#ffffff"}}>Scan History</Text>
+        </TouchableOpacity>
+
         <CameraView
           style={styles.camera}
           ref={ref}
@@ -143,12 +166,6 @@ export default function ScanScreen() {
     return (
     <ThemedView style={styles.scanImageContainer}>
       <BackButton onPress={() => setScreen(screens.CAMERA)}/>
-      {/* <TouchableOpacity 
-        style={styles.backButton}
-        onPress={() => {setScreen(screens.CAMERA)}}
-      >
-        <Text style={{fontSize: 24, color: "#ffffff"}}>←</Text>
-      </TouchableOpacity> */}
       <Image 
         source = {{ uri }}
         contentFit = "cover"
@@ -183,22 +200,17 @@ export default function ScanScreen() {
   }
 
   const render_scan_results = () => {
+    let scan = scanResults as PlantScanResult;
     return (
       <ThemedView style={{flex: 1}}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => {setScreen(screens.CAMERA)}}
-        >
-          <Text style={{fontSize: 24, color: "#ffffff"}}>←</Text>
-        </TouchableOpacity>
-
+        <BackButton onPress={() => setScreen(screens.CAMERA)}/>
         <ScanResults 
           imageUri={uri? uri : "placeholder image here"}
-          commonName={scanResults.commonName}
-          scientificName={scanResults.scientificName}
-          genus={scanResults.genus}
-          family={scanResults.family}
-          confidenceScore={scanResults.confidenceScore}
+          commonName={scan.commonName}
+          scientificName={scan.scientificName}
+          genus={scan.genus}
+          family={scan.family}
+          confidenceScore={scan.confidenceScore}
           description='testing'
         />
         
@@ -206,8 +218,20 @@ export default function ScanScreen() {
     );
   }
 
+  const render_scan_history = () => {
+    return (
+      <ThemedView style={{flex: 1}}>
+        <BackButton onPress={() => setScreen(screens.CAMERA)}/>
+        <ScanHistory onScanPress={(scan) => {
+          setScanFromHistory(scan);
+          setScreen(screens.SCAN_RESULTS);
+        }}/>
+      </ThemedView>
+    );
+  }
+
   if (currScreen === screens.SCAN_HISTORY) {
-  
+    return render_scan_history();
   } else if (currScreen === screens.LOADING) {
     return render_loading();
   } else if (currScreen === screens.SCAN_PREVIEW) {
@@ -315,4 +339,17 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 50,
   },
+
+  scanHistoryButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    width: 120,
+    height: 34,
+    zIndex: 10,
+    borderRadius: 22,
+    backgroundColor: '#1c4415',
+    justifyContent: 'center',
+    alignItems: 'center',
+},
 });

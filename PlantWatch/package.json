@@ -51,10 +51,15 @@
   "devDependencies": {
     "@types/aes-js": "^3.1.4",
     "@types/jest": "29.5.14",
+    "@types/node-fetch": "^2.6.13",
     "@types/react": "~19.1.0",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "form-data": "^4.0.5",
     "jest": "~29.7.0",
+    "jest-util": "^29.7.0",
+    "node-fetch": "^2.7.0",
     "ts-jest": "^29.4.6",
     "typescript": "~5.9.2"
   },

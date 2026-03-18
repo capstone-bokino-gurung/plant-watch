@@ -61,3 +61,21 @@ export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
     detectSessionInUrl: false,
   },
 });
+
+export function formatTime(timestamp: string) {
+  const date = new Date(timestamp);
+  
+  const timeStr = date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+  const dateStr = date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  
+  return `${timeStr} | ${dateStr}`;
+}

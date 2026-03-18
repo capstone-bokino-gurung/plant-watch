@@ -12,18 +12,10 @@ Deno.serve(async (req) => {
   try {
     const formData = await req.formData();
     const imageFile = formData.get('image') as File;
-      
-    if (!imageFile) {
-      return new Response(JSON.stringify({ error: 'No image provided' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
 
     const plantScannerForm = new FormData();  
     plantScannerForm.append('images', imageFile);
-    plantScannerForm.append('nb-results', String(1)); // Limit API results to 1
-
+    //plantScannerForm.append('nb-results', String(1)); // Limit API results to 1
     
     const response = await fetch(PLANTNET_API_URL, {
       method: 'POST',
@@ -32,7 +24,7 @@ Deno.serve(async (req) => {
 
     const result = await response.json();
 
-    if (result.results.length == 1) {
+    if (result.results && result.results.length >= 1) {
       const bestMatch = result.results[0];
       let reformattedResult: Record<string, string> = {
         commonName: bestMatch.species.commonNames[0],
@@ -47,6 +39,7 @@ Deno.serve(async (req) => {
         headers: { 'Content-Type': 'application/json' },
       });
     } else { // Assume the request failed
+      console.log(result);
       return new Response(null, {
         status: 204
       })
