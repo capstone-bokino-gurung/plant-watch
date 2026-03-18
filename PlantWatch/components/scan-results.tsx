@@ -209,5 +209,3 @@ const styles = StyleSheet.create({
 //     marginBottom: 5
 //   },
 // });</View>
-
-
