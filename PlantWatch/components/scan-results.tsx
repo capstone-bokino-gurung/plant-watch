@@ -1,5 +1,3 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { Image } from 'expo-image';
 import React, { useState, useEffect } from 'react';
