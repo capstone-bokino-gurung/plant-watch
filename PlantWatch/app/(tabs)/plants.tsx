@@ -14,6 +14,11 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { supabase } from '@/util/supabase';
 
+const MOCK_TEMP = 70;
+const MOCK_HUMIDITY = 65;
+const MOCK_SOIL_MOISTURE = 42;
+const LAST_UPDATED = new Date().toLocaleString();
+
 type Plant = {
   plant_id: string;
   common_name: string;
@@ -22,7 +27,16 @@ type Plant = {
   created_at: string;
 };
 
-export default function PlantsScreen() {
+function ConditionCard({ label, value, unit }: { label: string; value: number; unit: string }) {
+  return (
+    <View style={styles.conditionCard}>
+      <ThemedText style={styles.conditionLabel}>{label}</ThemedText>
+      <ThemedText style={styles.conditionValue}>{value}{unit}</ThemedText>
+    </View>
+  );
+}
+
+export default function GreenhouseDashboardScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { greenhouse_id, greenhouse_name } = useLocalSearchParams<{
@@ -104,11 +118,25 @@ export default function PlantsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ThemedText style={styles.backText}>← Back</ThemedText>
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>{greenhouse_name} — Plants</ThemedText>
+        <ThemedText style={styles.headerTitle}>{greenhouse_name}</ThemedText>
         <View style={{ width: 60 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Last Updated */}
+        <ThemedText style={styles.lastUpdated}>Last updated: {LAST_UPDATED}</ThemedText>
+
+        {/* Conditions Section */}
+        <ThemedText style={styles.sectionLabel}>CONDITIONS</ThemedText>
+        <View style={styles.conditionsRow}>
+          <ConditionCard label="Temp" value={MOCK_TEMP} unit="°F" />
+          <ConditionCard label="Humidity" value={MOCK_HUMIDITY} unit="%" />
+          <ConditionCard label="Soil" value={MOCK_SOIL_MOISTURE} unit="%" />
+        </View>
+
+        {/* Plants Section */}
+        <ThemedText style={styles.sectionLabel}>PLANTS ({plants.length})</ThemedText>
         {loading ? (
           <ThemedText style={styles.emptyText}>Loading...</ThemedText>
         ) : plants.length === 0 ? (
@@ -180,9 +208,15 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
   backButton: { padding: 8, width: 80 },
   backText: { color: '#2d6a4f', fontSize: 16 },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: 16, fontWeight: 'bold', color: '#2d6a4f' },
+  headerTitle: { flex: 1, textAlign: 'center', fontSize: 18, fontWeight: 'bold', color: '#2d6a4f' },
   content: { padding: 16, paddingBottom: 100 },
-  emptyText: { textAlign: 'center', marginTop: 40, color: '#999', fontSize: 16 },
+  lastUpdated: { fontSize: 11, color: '#999', marginBottom: 16, textAlign: 'right' },
+  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#999', marginBottom: 8, letterSpacing: 1 },
+  conditionsRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  conditionCard: { flex: 1, backgroundColor: '#f5f5f5', borderRadius: 10, padding: 14, alignItems: 'center' },
+  conditionLabel: { fontSize: 11, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 4 },
+  conditionValue: { fontSize: 22, fontWeight: 'bold', color: '#2d6a4f' },
+  emptyText: { textAlign: 'center', marginTop: 20, color: '#999', fontSize: 16 },
   plantCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 10, padding: 14, marginBottom: 12 },
   plantInfo: { flex: 1 },
   plantName: { fontSize: 16, fontWeight: 'bold' },
