@@ -1,4 +1,5 @@
 export interface PlantScanResult {
+  imageUri: string;
   commonName: string;
   genus: string;
   family: string;

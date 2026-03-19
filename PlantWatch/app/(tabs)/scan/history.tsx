@@ -1,12 +1,14 @@
+import { LoadingSpinner } from "@/components/loading-spin";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from '@/components/themed-view';
 import { ThemeColors } from "@/hooks/get-theme-colors";
 import { useAuth } from "@/hooks/useAuth";
+import { PlantScanResult } from '@/interfaces/plant';
 import { getScans } from "@/services/plant";
 import { formatTime } from "@/util/supabase";
+import { router } from 'expo-router';
 import { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, useColorScheme } from "react-native";
-import { LoadingSpinner } from "./loading-spin";
-import { ThemedText } from "./themed-text";
-import { ThemedView } from "./themed-view";
+import { Image, ScrollView, StyleSheet, TouchableOpacity, useColorScheme } from "react-native";
 
 interface ScanHistoryProps {
   onScanPress: (scan: any) => void;
@@ -39,7 +41,7 @@ const ScanCard = ({ imageUri, commonName, time, onPress }: ScanCardProps) => {
   );
 };
 
-export function ScanHistory({ onScanPress }: ScanHistoryProps) {
+export default function HistoryScreen() {
     const theme = useColorScheme() ?? 'light'; 
     const {session, user} = useAuth();
     const [scanHistory, setScanHistory] = useState<any[]>([]);
@@ -65,6 +67,27 @@ export function ScanHistory({ onScanPress }: ScanHistoryProps) {
         loadScans();
     }, [session, user]);
 
+    const handleScanPress = (scan: any) => {
+        const scanData: PlantScanResult = {
+            imageUri: scan.scan_img_uri,
+            commonName: scan.common_name,
+            scientificName: scan.scientific_name,
+            genus: scan.genus,
+            family: scan.family,
+            confidenceScore: String(scan.confidence_score),
+        };
+
+        // Navigate to results with the historical scan data
+        router.push({
+            pathname: '/scan/results',
+            params: {
+                imageUri: scan.scan_img_url,
+                scanData: JSON.stringify(scanData),
+                from: 'history'
+            },
+        });
+    };
+
     if (!session || !user) {
         return <ThemedView />;
     }
@@ -80,10 +103,6 @@ export function ScanHistory({ onScanPress }: ScanHistoryProps) {
 
     return (
         <ThemedView style={{flex: 1, alignItems: "center"}}>
-            <ThemedView style={styles.header}>
-                <Text style={{color: theme == 'light' ? ThemeColors.button : '#fff', fontSize: 24}}>Scan History</Text>
-            </ThemedView>
-            
             <ThemedView style={styles.scrollContainer}>
                 <ScrollView contentContainerStyle={{paddingLeft: '5%'}}>
                     {scanHistory.map(scan => (
@@ -92,17 +111,19 @@ export function ScanHistory({ onScanPress }: ScanHistoryProps) {
                             imageUri={scan.scan_img_url}
                             commonName={scan.common_name}
                             time={formatTime(scan.created_at)}
-                            onPress={() => onScanPress(scan)} // Pass the scan data up
+                            onPress={() => handleScanPress(scan)} // Pass the scan data up
                         />
                     ))}
                 </ScrollView>
             </ThemedView>
         </ThemedView>
     );
-
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     centeredContainer: {
         flex: 1,
         alignItems: "center",
@@ -118,11 +139,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     scrollContainer: {
-        top: 125,
+        top: '2.5%',
         paddingTop: 20,
         justifyContent: 'center',
         width: '85%',
-        height: '75%',
+        height: '95%',
         borderRadius: 12,
         backgroundColor: ThemeColors.darkerBackground
     },

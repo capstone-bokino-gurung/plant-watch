@@ -11,6 +11,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName='greenhouse'
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
@@ -25,12 +26,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="greenhouse"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-          headerShown: true,
-          headerTitle: 'PlantWatch',
         }}
       />
       <Tabs.Screen
@@ -41,15 +40,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="greenhouse"
+        name="index"
         options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="plants"
-        options={{
-          href: null,
+          href: null
         }}
       />
     </Tabs>
