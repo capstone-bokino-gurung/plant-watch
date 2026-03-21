@@ -13,7 +13,8 @@ export default function GreenhouseLayout() {
         name="plants"
         options={{
             headerShown: false
-        }}/>
+        }}
+      />
     </Stack>
   );
 }

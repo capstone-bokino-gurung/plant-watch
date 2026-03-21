@@ -16,56 +16,55 @@ import {
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-type Greenhouse = { greenhouse_id: string; name: string; created_at: string };
+import { createGreenhouse, deleteGreenhouse, getUserGreenhouses } from '@/services/greenhouse';
+import { Greenhouse } from '@/interfaces/greenhouse';
 
 export default function GreenhouseScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const [greenhouses, setGreenhouses] = useState<Greenhouse[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loadingFetch, setLoadingFetch] = useState(true);
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [newGreenhouseName, setNewGreenhouseName] = useState('');
-    const {session, user} = useAuth();
+    const {session, user, loading} = useAuth();
   
 
     useEffect(() => {
+        if (loading) return;
         fetchGreenhouses();
-    }, []);
+        setLoadingFetch(false);
+    }, [loading]);
 
     async function fetchGreenhouses() {
-        setLoading(true);
-        const { data, error } = await supabase.from('greenhouse').select('*');
+        if (!session || !user) return;
+        const { data, error } = await getUserGreenhouses(user.id);
         if (error) {
-        Alert.alert('Error', error.message);
+            Alert.alert('Error', error);
         } else {
-        setGreenhouses(data || []);
-        }
-        setLoading(false);
-    }
-
-    async function createGreenhouse() {
-        if (!newGreenhouseName.trim()) return;
-        const { data, error } = await supabase
-        .from('greenhouse')
-        .insert({ name: newGreenhouseName.trim() })
-        .select()
-        .single();
-        if (error) {
-        Alert.alert('Error', error.message);
-        } else {
-        setGreenhouses(prev => [...prev, data]);
-        setNewGreenhouseName('');
-        setCreateModalOpen(false);
+            setGreenhouses(data || []);
         }
     }
 
-    async function deleteGreenhouse(id: string) {
+    async function createGreenhouseReact() {
+        if (!newGreenhouseName || !user) return;
+
+        const { data, error } = await createGreenhouse(user.id, newGreenhouseName);
+        
+        if (error) {
+            Alert.alert('Error', typeof error === 'string' ? error : error.message);
+        } else {
+            setGreenhouses(prev => [...prev, data]);
+            setNewGreenhouseName('');
+            setCreateModalOpen(false);
+        }
+    }
+
+    async function deleteGreenhouseReact(id: string) {
         Alert.alert('Delete Greenhouse', 'Are you sure?', [
         { text: 'Cancel', style: 'cancel' },
         {
             text: 'Delete', style: 'destructive', onPress: async () => {
-            const { error } = await supabase.from('greenhouse').delete().eq('greenhouse_id', id);
+            const { error } = await deleteGreenhouse(id);
             if (error) {
                 Alert.alert('Error', error.message);
             } else {
@@ -84,31 +83,33 @@ export default function GreenhouseScreen() {
             </View>
 
             <ScrollView contentContainerStyle={styles.content}>
-                {loading ? (
-                <ThemedText style={styles.emptyText}>Loading...</ThemedText>
+                {loadingFetch ? (
+                    <ThemedText style={styles.emptyText}>Loading...</ThemedText>
                 ) : greenhouses.length === 0 ? (
-                <ThemedText style={styles.emptyText}>No greenhouses yet. Create one!</ThemedText>
+                    <ThemedText style={styles.emptyText}>No greenhouses yet. Create one!</ThemedText>
                 ) : (
-                greenhouses.map(g => (
-                    <View key={g.greenhouse_id} style={styles.greenhouseRow}>
-                    <TouchableOpacity
-                        style={styles.greenhouseCard}
-                        onPress={() => router.push({
-                        pathname: '/greenhouse/plants',
-                        params: {
-                            greenhouse_id: g.greenhouse_id,
-                            greenhouse_name: g.name,
-                        },
-                        })}
-                    >
-                        <ThemedText style={styles.greenhouseName}>{g.name}</ThemedText>
-                        <ThemedText style={styles.greenhouseArrow}>→</ThemedText>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => deleteGreenhouse(g.greenhouse_id)} style={styles.deleteButton}>
-                        <ThemedText style={styles.deleteText}>🗑</ThemedText>
-                    </TouchableOpacity>
-                    </View>
-                ))
+                    greenhouses.map(g => {
+                        return (
+                            <View key={g.greenhouse_id} style={styles.greenhouseRow}>
+                                <TouchableOpacity
+                                    style={styles.greenhouseCard}
+                                    onPress={() => router.push({
+                                        pathname: '/greenhouse/plants',
+                                        params: {
+                                            greenhouse_id: g.greenhouse_id,
+                                            greenhouse_name: g.name,
+                                        },
+                                    })}
+                                >
+                                    <ThemedText style={styles.greenhouseName}>{g.name}</ThemedText>
+                                    <ThemedText style={styles.greenhouseArrow}>→</ThemedText>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => deleteGreenhouseReact(g.greenhouse_id)} style={styles.deleteButton}>
+                                    <ThemedText style={styles.deleteText}>🗑</ThemedText>
+                                </TouchableOpacity>
+                            </View>)
+                        }
+                    )
                 )}
             </ScrollView>
 
@@ -131,7 +132,7 @@ export default function GreenhouseScreen() {
                     value={newGreenhouseName}
                     onChangeText={setNewGreenhouseName}
                     />
-                    <TouchableOpacity style={styles.createButton} onPress={createGreenhouse}>
+                    <TouchableOpacity style={styles.createButton} onPress={createGreenhouseReact}>
                     <ThemedText style={styles.createButtonText}>Create</ThemedText>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => setCreateModalOpen(false)}>

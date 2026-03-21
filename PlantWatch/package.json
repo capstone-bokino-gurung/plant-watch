@@ -11,7 +11,13 @@
     "lint": "expo lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
+    "test:api": "jest --config jest.config.api.js",
+    "test:coverage": "jest --coverage",
+    "test:coverage:unit": "jest tests/unit --coverage",
+    "test:coverage:integration": "jest tests/integration --coverage",
+    "test:all": "npm run test && npm run test:api"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -53,6 +59,7 @@
     "@types/jest": "29.5.14",
     "@types/node-fetch": "^2.6.13",
     "@types/react": "~19.1.0",
+    "babel-jest": "^30.3.0",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",

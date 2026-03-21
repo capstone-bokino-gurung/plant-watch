@@ -86,7 +86,7 @@ export async function deleteScan(userId: string, scanId: string) {
         .from(SCAN_HISTORY_TABLE)
         .delete()
         .eq('scan_id', scanId)
-        .eq('user_id', userId);
+         
 
     if (deleteError) throw new Error(`Failed to delete scan: ${deleteError.message}`);
 }

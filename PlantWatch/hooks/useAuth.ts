@@ -23,7 +23,7 @@ interface UseAuthReturn {
 }
 
 export function useAuth(): UseAuthReturn {
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true);
   const [session, setSession] = useState<Session | null>(globalSession);
 
   useEffect(() => {
