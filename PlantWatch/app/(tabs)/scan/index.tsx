@@ -36,7 +36,7 @@ export default function ScanScreen() {
     const photo = await ref.current?.takePictureAsync();
     if (photo?.uri) {
       // Navigate to preview with the image URI
-      router.replace({
+      router.push({
         pathname: '/scan/preview',
         params: { imageUri: photo.uri }
       });
