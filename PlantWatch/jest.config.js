@@ -20,9 +20,10 @@ module.exports = {
   
   collectCoverageFrom: [
     'services/**/*.{ts,tsx}',
-    'app/**/*.{ts,tsx}',
+    'app/**/*.{ts}',
     '!services/**/*.test.{ts,tsx}',
     '!services/**/index.{ts,tsx}',
+    '!**/*.d.ts',
   ],
   
   coverageDirectory: 'coverage',
