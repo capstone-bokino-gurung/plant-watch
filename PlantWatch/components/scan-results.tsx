@@ -5,6 +5,8 @@ import { Modal, ScrollView, TouchableOpacity, StyleSheet, View, Alert } from 're
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { supabase } from '@/util/supabase';
+import { getUserGreenhouses } from '@/services/greenhouse';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ScanResultsProps {
   imageUri: string;
@@ -24,14 +26,20 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
   const [modalOpen, setModalOpen] = useState(false);
   const [greenhouses, setGreenhouses] = useState<Greenhouse[]>([]);
   const [added, setAdded] = useState(false);
-
+  const { session, user } = useAuth();
+  
   useEffect(() => {
-    if (modalOpen) fetchGreenhouses();
-  }, [modalOpen]);
+    fetchGreenhouses();
+  }, []);
 
   async function fetchGreenhouses() {
-    const { data, error } = await supabase.from('greenhouse').select('*');
-    if (!error) setGreenhouses(data || []);
+      if (!session || !user) return;
+      const { data, error } = await getUserGreenhouses(user.id);
+      if (error) {
+          Alert.alert('Error', error);
+      } else {
+          setGreenhouses(data || []);
+      }
   }
 
   async function addToGreenhouse(greenhouse_id: string) {
@@ -125,7 +133,7 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000000' },
+  container: { flex: 1 },
   contentContainer: { padding: 20, paddingTop: 120 },
   topSection: { flexDirection: 'row', marginBottom: 24, height: 180, borderRadius: 12 },
   image: { width: 120, height: 180, borderRadius: 12, marginRight: 16 },

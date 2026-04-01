@@ -1,10 +1,9 @@
 import { LoadingSpinner } from '@/components/loading-spin';
 import { ThemedView } from '@/components/themed-view';
 import { BackButton } from '@/components/ui/back-button';
-import { scan_plant } from '@/hooks/scanPlant';
 import { useAuth } from '@/hooks/useAuth';
 import { PlantScanResult } from '@/interfaces/plant';
-import { logScan } from '@/services/plant';
+import { scanPlant, getDescription, logScan } from '@/services/plant';
 import { Image } from 'expo-image';
 import { SaveFormat, useImageManipulator } from 'expo-image-manipulator';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -34,19 +33,25 @@ export default function PreviewScreen() {
 
         try {
             const formattedUri = await reformatImage(imageUri);
-            const scanResponse = await scan_plant(formattedUri);
+            const scanResponse = await scanPlant(formattedUri);
 
             if (!scanResponse.error && scanResponse.data) {
-                if (session && user) {
-                    await logScan(user.id, formattedUri, scanResponse.data as PlantScanResult);
-                }
+                const result: PlantScanResult = scanResponse.data;
+                result.description = "Error retrieving description.";
+
+                const description = await getDescription(result.commonName);
+                if (description.data != null) 
+                    result.description = description.data;
+
+                if (session && user) 
+                    await logScan(user.id, formattedUri, result);
 
                 // Navigate to results with scan data
-                router.push({
+                router.replace({
                     pathname: '/scan/results',
                     params: {
                         imageUri: formattedUri,
-                        scanData: JSON.stringify(scanResponse.data),
+                        scanData: JSON.stringify(result),
                         from: 'camera'
                     },
                 });

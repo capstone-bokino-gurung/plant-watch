@@ -5,4 +5,5 @@ export interface PlantScanResult {
   family: string;
   scientificName: string;
   confidenceScore: string;
+  description: string;
 }

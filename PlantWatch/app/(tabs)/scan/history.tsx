@@ -75,6 +75,7 @@ export default function HistoryScreen() {
             genus: scan.genus,
             family: scan.family,
             confidenceScore: String(scan.confidence_score),
+            description: 'No description available.'
         };
 
         // Navigate to results with the historical scan data

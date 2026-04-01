@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     marginBottom: 12,
-    color: '#000',
+    color: ThemeColors.text
   },
   registerButton: {
     backgroundColor: ThemeColors.button,

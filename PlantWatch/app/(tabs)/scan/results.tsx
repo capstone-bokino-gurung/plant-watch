@@ -32,7 +32,7 @@ export default function ResultsScreen() {
             genus={parsedScanData.genus}
             family={parsedScanData.family}
             confidenceScore={parsedScanData.confidenceScore}
-            description={ 'No description available'}
+            description={parsedScanData.description}
         />
         </ThemedView>
     );

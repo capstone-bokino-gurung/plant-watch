@@ -2,9 +2,69 @@ import { PlantScanResult } from '@/interfaces/plant';
 import { supabase } from '@/util/supabase';
 import { File } from 'expo-file-system';
 
+const SCAN_ENDPOINT = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/processPlantScan`;
+const DESC_ENDPOINT = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/getPlantDesc`;
 const SCAN_HISTORY_TABLE = 'scan_history';
 const PLANT_IMG_BUCKET = 'plant_images';
 const SCAN_LIMIT = 1;
+
+// Return plant's openAI description (string)
+export async function getDescription(commonName: string) {
+    try {
+        const response = await fetch(DESC_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ commonName: commonName }),
+        });
+
+        if (response.ok) {
+            const responseJSON = await response.json();
+            console.log(responseJSON)
+            return {data: responseJSON.message};
+        }
+
+        console.log("Description retrieval failed");
+        return {data: null, error: "Description retrieval failed"};
+    } catch (error) {
+        console.error('Description retrieval failed:', error);
+        return { 
+            data: null, 
+            error: error instanceof Error ? error.message : 'An unknown error occurred' 
+        };
+    }
+}
+
+export async function scanPlant(uri: string) {
+    try {
+        const formData = new FormData();  
+            formData.append('image', {
+            uri: uri,
+            type: 'image/jpeg',
+            name: 'scan.jpg',
+        } as any);
+
+        const response = await fetch(SCAN_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+            },
+            body: formData,
+        });
+
+        if (response.ok)
+            return {data: await response.json()};
+        console.log("Identification failed.");
+        return {data: null, error: "Identification failed."};
+    } catch (error) {
+        console.error('Plant scan error:', error);
+        return { 
+            data: null, 
+            error: error instanceof Error ? error.message : 'An unknown error occurred' 
+        };
+    }
+}
 
 // Return: imageURL (string)
 async function saveImageToDatabase(userId: string, uri: string, tableName: string) {
@@ -101,7 +161,7 @@ export async function logScan(userId: string, uri: string, scan: PlantScanResult
             genus: scan.genus,
             family: scan.family,
             scientific_name: scan.scientificName,
-            confidence_score: Number(scan.confidenceScore)
+            confidence_score: Number(scan.confidenceScore),
         })
         .select().single();
 
