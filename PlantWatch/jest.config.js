@@ -20,6 +20,7 @@ module.exports = {
   
   collectCoverageFrom: [
     'services/**/*.{ts,tsx}',
+    'app/**/*.{ts,tsx}',
     '!services/**/*.test.{ts,tsx}',
     '!services/**/index.{ts,tsx}',
   ],
