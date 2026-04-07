@@ -15,6 +15,12 @@ export default function GreenhouseLayout() {
             headerShown: false
         }}
       />
+      <Stack.Screen
+        name="plant"
+        options={{
+            headerShown: false
+        }}
+      />
     </Stack>
   );
 }
