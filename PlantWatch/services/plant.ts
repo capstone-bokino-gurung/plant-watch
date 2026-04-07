@@ -5,7 +5,8 @@ import { File } from 'expo-file-system';
 const SCAN_ENDPOINT = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/processPlantScan`;
 const DESC_ENDPOINT = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/getPlantDesc`;
 const SCAN_HISTORY_TABLE = 'scan_history';
-const PLANT_IMG_BUCKET = 'plant_images';
+const PLANT_TABLE = 'plants'
+export const PLANT_IMG_BUCKET = 'plant_images';
 const SCAN_LIMIT = 1;
 
 // Return plant's openAI description (string)
@@ -67,7 +68,7 @@ export async function scanPlant(uri: string) {
 }
 
 // Return: imageURL (string)
-async function saveImageToDatabase(userId: string, uri: string, tableName: string) {
+export async function saveImageToDatabase(userId: string, uri: string, tableName: string) {
     const file = new File(uri);
     const fh = file.open();
     const bytes = fh.readBytes(fh.size ?? 0);
@@ -149,6 +150,72 @@ export async function deleteScan(userId: string, scanId: string) {
          
 
     if (deleteError) throw new Error(`Failed to delete scan: ${deleteError.message}`);
+}
+
+export async function getGreenhousePlants(greenhouseId: string) {
+    const { data, error } = await supabase
+        .from(PLANT_TABLE)
+        .select('*')
+        .eq('greenhouse_id', greenhouseId);
+    return { data, error };
+}
+
+export async function addGreenhousePlant(
+    greenhouseId: string,
+    commonName: string,
+    scientificName: string,
+    notes: string,
+    label: string,
+    count: number,
+    imageUrl?: string,
+) {
+    const { data, error } = await supabase
+        .from(PLANT_TABLE)
+        .insert({
+            greenhouse_id: greenhouseId,
+            common_name: commonName,
+            scientific_name: scientificName,
+            notes: notes,
+            label: label,
+            count: count,
+            image_url: imageUrl ?? null,
+        })
+        .select()
+        .single();
+    return { data, error };
+}
+
+export async function updateGreenhousePlant(
+    plantId: string,
+    commonName: string,
+    scientificName: string,
+    notes: string,
+    label: string,
+    count: number,
+    imageUrl?: string,
+) {
+    const { data, error } = await supabase
+        .from(PLANT_TABLE)
+        .update({
+            common_name: commonName,
+            scientific_name: scientificName,
+            notes: notes,
+            label: label,
+            count: count,
+            image_url: imageUrl ?? null,
+        })
+        .eq('plant_id', plantId)
+        .select()
+        .single();
+    return { data, error };
+}
+
+export async function deleteGreenhousePlant(plantId: string) {
+    const { error } = await supabase
+        .from(PLANT_TABLE)
+        .delete()
+        .eq('plant_id', plantId);
+    return { error };
 }
 
 export async function logScan(userId: string, uri: string, scan: PlantScanResult) {

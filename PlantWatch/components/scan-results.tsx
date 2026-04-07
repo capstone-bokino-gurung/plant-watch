@@ -1,12 +1,13 @@
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { Image } from 'expo-image';
 import React, { useState, useEffect } from 'react';
-import { Modal, ScrollView, TouchableOpacity, StyleSheet, View, Alert } from 'react-native';
+import { Modal, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { supabase } from '@/util/supabase';
 import { getUserGreenhouses } from '@/services/greenhouse';
 import { useAuth } from '@/hooks/useAuth';
+import { AddPlant } from '@/components/add-plant';
+import { Plant } from '@/interfaces/plant';
 
 interface ScanResultsProps {
   imageUri: string;
@@ -26,6 +27,8 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
   const [modalOpen, setModalOpen] = useState(false);
   const [greenhouses, setGreenhouses] = useState<Greenhouse[]>([]);
   const [added, setAdded] = useState(false);
+  const [selectedGreenhouseId, setSelectedGreenhouseId] = useState<string | null>(null);
+  const [addPlantModalOpen, setAddPlantModalOpen] = useState(false);
   const { session, user } = useAuth();
   
   useEffect(() => {
@@ -42,19 +45,10 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
       }
   }
 
-  async function addToGreenhouse(greenhouse_id: string) {
-    const { error } = await supabase.from('plants').insert({
-      greenhouse_id,
-      common_name: commonName,
-      scientific_name: scientificName,
-    });
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
-      setAdded(true);
-      setModalOpen(false);
-      Alert.alert('Success', `${commonName} added to greenhouse!`);
-    }
+  function selectGreenhouse(greenhouse_id: string) {
+    setSelectedGreenhouseId(greenhouse_id);
+    setModalOpen(false);
+    setAddPlantModalOpen(true);
   }
 
   return (
@@ -106,8 +100,8 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
 
     {/* Greenhouse Picker Modal */}
       <Modal visible={modalOpen} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modal}>
+        <ThemedView style={styles.modalOverlay}>
+          <ThemedView style={styles.modal}>
             <ThemedText style={styles.modalTitle}>Select Greenhouse</ThemedText>
             {greenhouses.length === 0 ? (
               <ThemedText style={styles.emptyText}>No greenhouses found.</ThemedText>
@@ -116,7 +110,7 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
                 <TouchableOpacity
                   key={g.greenhouse_id}
                   style={styles.greenhouseItem}
-                  onPress={() => addToGreenhouse(g.greenhouse_id)}
+                  onPress={() => selectGreenhouse(g.greenhouse_id)}
                 >
                   <ThemedText style={styles.greenhouseItemText}>{g.name}</ThemedText>
                 </TouchableOpacity>
@@ -125,9 +119,28 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
             <TouchableOpacity onPress={() => setModalOpen(false)}>
               <ThemedText style={styles.cancelText}>Cancel</ThemedText>
             </TouchableOpacity>
-          </View>
-        </View>
+          </ThemedView>
+        </ThemedView>
       </Modal>
+
+      {selectedGreenhouseId && (
+        <AddPlant
+          key={selectedGreenhouseId + addPlantModalOpen}
+          visible={addPlantModalOpen}
+          greenhouseId={selectedGreenhouseId}
+          initialCommonName={commonName}
+          initialScientificName={scientificName}
+          initialLabel={commonName}
+          initialNotes={description}
+          initialImageUri={imageUri}
+          onAdd={(plant: Plant) => {
+            setAdded(true);
+            setAddPlantModalOpen(false);
+            Alert.alert('Success', `${plant.common_name} added to greenhouse!`);
+          }}
+          onClose={() => setAddPlantModalOpen(false)}
+        />
+      )}
     </ScrollView>
   );
 }
@@ -140,7 +153,7 @@ const styles = StyleSheet.create({
   infoRows: { flex: 1, justifyContent: 'space-between' },
   row: { flex: 1, justifyContent: 'center' },
   label: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
-  value: { fontSize: 17, fontWeight: '600', color: '#000000' },
+  value: { fontSize: 17, fontWeight: '600' },
   descriptionContainer: { borderRadius: 12, padding: 18, minHeight: 150 },
   descriptionLabel: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
   descriptionText: { fontSize: 16, lineHeight: 24, marginBottom: 5 },
@@ -148,10 +161,10 @@ const styles = StyleSheet.create({
   addButtonDone: { backgroundColor: '#888' },
   addButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modal: { backgroundColor: '#fff', borderRadius: 12, padding: 24, width: '80%' },
+  modal: { borderRadius: 12, padding: 24, width: '80%' },
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
   emptyText: { color: '#999', textAlign: 'center', marginBottom: 12 },
-  greenhouseItem: { padding: 14, borderRadius: 8, backgroundColor: '#f5f5f5', marginBottom: 8 },
+  greenhouseItem: { padding: 14, borderRadius: 8, backgroundColor: ThemeColors.inputBackground, marginBottom: 8 },
   greenhouseItemText: { fontSize: 16 },
   cancelText: { textAlign: 'center', marginTop: 8, color: '#999', fontSize: 14 },
 });

@@ -78,9 +78,9 @@ export default function GreenhouseScreen() {
         return (
             <ThemedView style={styles.container}>
             {/* Header */}
-            <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+            <ThemedView style={[styles.header, { paddingTop: insets.top + 8 }]}>
                 <ThemedText style={styles.headerTitle}>My Greenhouses</ThemedText>
-            </View>
+            </ThemedView>
 
             <ScrollView contentContainerStyle={styles.content}>
                 {loadingFetch ? (
@@ -168,12 +168,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   container: { flex: 1 },
-  header: { paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
-  headerTitle: { fontSize: 22, fontWeight: 'bold', color: '#2d6a4f' },
+  header: { paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: ThemeColors.inputBackground },
+  headerTitle: { fontSize: 22, fontWeight: 'bold', color: ThemeColors.header },
   content: { padding: 16, paddingBottom: 100 },
   emptyText: { textAlign: 'center', marginTop: 40, color: '#999', fontSize: 16 },
   greenhouseRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  greenhouseCard: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 12, padding: 16 },
+  greenhouseCard: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: ThemeColors.inputBackground, borderRadius: 12, padding: 16 },
   greenhouseName: { flex: 1, fontSize: 16, fontWeight: '600' },
   greenhouseArrow: { fontSize: 18, color: '#2d6a4f' },
   deleteButton: { padding: 8, marginLeft: 8 },
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   modal: { backgroundColor: '#fff', borderRadius: 12, padding: 24, width: '80%' },
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
   input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, marginBottom: 8 },
-  createButton: { backgroundColor: '#2d6a4f', padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 12 },
+  createButton: { backgroundColor: ThemeColors.button, padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 12 },
   createButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
   cancelText: { textAlign: 'center', marginTop: 12, color: '#999', fontSize: 14 },
 });

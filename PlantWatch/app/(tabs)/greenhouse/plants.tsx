@@ -1,31 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
   View,
-  Modal,
-  TextInput,
   Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
+import { AddPlant } from '@/components/add-plant';
 import { ThemedView } from '@/components/themed-view';
-import { supabase } from '@/util/supabase';
+import { ThemeColors } from '@/hooks/get-theme-colors';
+import { getGreenhousePlants, deleteGreenhousePlant } from '@/services/plant';
+import { Plant } from '@/interfaces/plant';
 
 const MOCK_TEMP = 70;
 const MOCK_HUMIDITY = 65;
 const MOCK_SOIL_MOISTURE = 42;
 const LAST_UPDATED = new Date().toLocaleString();
 
-type Plant = {
-  plant_id: string;
-  common_name: string;
-  scientific_name: string;
-  notes: string;
-  created_at: string;
-};
 
 function ConditionCard({ label, value, unit }: { label: string; value: number; unit: string }) {
   return (
@@ -47,20 +42,13 @@ export default function GreenhouseDashboardScreen() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [commonName, setCommonName] = useState('');
-  const [scientificName, setScientificName] = useState('');
-  const [notes, setNotes] = useState('');
-
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     if (greenhouse_id) fetchPlants();
-  }, [greenhouse_id]);
+  }, [greenhouse_id]));
 
   async function fetchPlants() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('plants')
-      .select('*')
-      .eq('greenhouse_id', greenhouse_id);
+    const { data, error } = await getGreenhousePlants(greenhouse_id);
     if (error) {
       Alert.alert('Error', error.message);
     } else {
@@ -69,38 +57,12 @@ export default function GreenhouseDashboardScreen() {
     setLoading(false);
   }
 
-  async function addPlant() {
-    if (!commonName.trim()) {
-      Alert.alert('Error', 'Please enter a plant name.');
-      return;
-    }
-    const { data, error } = await supabase
-      .from('plants')
-      .insert({
-        greenhouse_id,
-        common_name: commonName.trim(),
-        scientific_name: scientificName.trim(),
-        notes: notes.trim(),
-      })
-      .select()
-      .single();
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
-      setPlants(prev => [...prev, data]);
-      setCommonName('');
-      setScientificName('');
-      setNotes('');
-      setAddModalOpen(false);
-    }
-  }
-
   async function deletePlant(id: string) {
     Alert.alert('Delete Plant', 'Are you sure?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete', style: 'destructive', onPress: async () => {
-          const { error } = await supabase.from('plants').delete().eq('plant_id', id);
+          const { error } = await deleteGreenhousePlant(id);
           if (error) {
             Alert.alert('Error', error.message);
           } else {
@@ -110,6 +72,15 @@ export default function GreenhouseDashboardScreen() {
       }
     ]);
   }
+
+  const handlePlantPress = (plant: Plant) => {
+      router.push({
+          pathname: '/greenhouse/plant',
+          params: {
+              plantData: JSON.stringify(plant),
+          },
+      });
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -143,20 +114,17 @@ export default function GreenhouseDashboardScreen() {
           <ThemedText style={styles.emptyText}>No plants added yet.</ThemedText>
         ) : (
           plants.map(plant => (
-            <View key={plant.plant_id} style={styles.plantCard}>
+            <TouchableOpacity onPress={() => handlePlantPress(plant)} key={plant.plant_id} style={styles.plantCard}>
               <View style={styles.plantInfo}>
-                <ThemedText style={styles.plantName}>{plant.common_name}</ThemedText>
+                <ThemedText style={styles.plantName}>{plant.label}</ThemedText>
                 {plant.scientific_name ? (
-                  <ThemedText style={styles.plantScientific}>{plant.scientific_name}</ThemedText>
-                ) : null}
-                {plant.notes ? (
-                  <ThemedText style={styles.plantNotes}>{plant.notes}</ThemedText>
+                  <ThemedText style={styles.plantScientific}>Common Name: {plant.common_name}</ThemedText>
                 ) : null}
               </View>
               <TouchableOpacity onPress={() => deletePlant(plant.plant_id)} style={styles.deleteButton}>
                 <ThemedText style={styles.deleteText}>🗑</ThemedText>
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           ))
         )}
       </ScrollView>
@@ -166,46 +134,19 @@ export default function GreenhouseDashboardScreen() {
         <ThemedText style={styles.fabText}>+</ThemedText>
       </TouchableOpacity>
 
-      {/* Add Plant Modal */}
-      <Modal visible={addModalOpen} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modal}>
-            <ThemedText style={styles.modalTitle}>Add Plant</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Common name (required)"
-              value={commonName}
-              onChangeText={setCommonName}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Scientific name (optional)"
-              value={scientificName}
-              onChangeText={setScientificName}
-            />
-            <TextInput
-              style={[styles.input, styles.notesInput]}
-              placeholder="Notes (optional)"
-              value={notes}
-              onChangeText={setNotes}
-              multiline
-            />
-            <TouchableOpacity style={styles.addButton} onPress={addPlant}>
-              <ThemedText style={styles.addButtonText}>Add Plant</ThemedText>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setAddModalOpen(false)}>
-              <ThemedText style={styles.cancelText}>Cancel</ThemedText>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <AddPlant
+        visible={addModalOpen}
+        greenhouseId={greenhouse_id}
+        onClose={() => setAddModalOpen(false)}
+        onAdd={plant => setPlants(prev => [...prev, plant])}
+      />
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, backgroundColor: ThemeColors.inputBackground},
   backButton: { padding: 8, width: 80 },
   backText: { color: '#2d6a4f', fontSize: 16 },
   headerTitle: { flex: 1, textAlign: 'center', fontSize: 18, fontWeight: 'bold', color: '#2d6a4f' },
@@ -213,25 +154,25 @@ const styles = StyleSheet.create({
   lastUpdated: { fontSize: 11, color: '#999', marginBottom: 16, textAlign: 'right' },
   sectionLabel: { fontSize: 11, fontWeight: '700', color: '#999', marginBottom: 8, letterSpacing: 1 },
   conditionsRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
-  conditionCard: { flex: 1, backgroundColor: '#f5f5f5', borderRadius: 10, padding: 14, alignItems: 'center' },
-  conditionLabel: { fontSize: 11, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 4 },
-  conditionValue: { fontSize: 22, fontWeight: 'bold', color: '#2d6a4f' },
+  conditionCard: { flex: 1, backgroundColor: ThemeColors.inputBackground, borderRadius: 10, padding: 14, alignItems: 'center' },
+  conditionLabel: { fontSize: 11, fontWeight: '700', color: ThemeColors.sectionHeader, letterSpacing: 1, marginBottom: 4 },
+  conditionValue: { fontSize: 22, fontWeight: 'bold', color: ThemeColors.button },
   emptyText: { textAlign: 'center', marginTop: 20, color: '#999', fontSize: 16 },
-  plantCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 10, padding: 14, marginBottom: 12 },
+  plantCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: ThemeColors.inputBackground, borderRadius: 10, padding: 14, marginBottom: 12 },
   plantInfo: { flex: 1 },
   plantName: { fontSize: 16, fontWeight: 'bold' },
   plantScientific: { fontSize: 13, fontStyle: 'italic', color: '#666', marginTop: 2 },
   plantNotes: { fontSize: 13, color: '#888', marginTop: 4 },
   deleteButton: { padding: 8 },
   deleteText: { fontSize: 20 },
-  fab: { position: 'absolute', right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: '#2d6a4f', alignItems: 'center', justifyContent: 'center', elevation: 4 },
+  fab: { position: 'absolute', right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: ThemeColors.button, alignItems: 'center', justifyContent: 'center', elevation: 4 },
   fabText: { color: '#fff', fontSize: 32, lineHeight: 36 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modal: { backgroundColor: '#fff', borderRadius: 12, padding: 24, width: '85%' },
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
   input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, marginBottom: 10 },
   notesInput: { height: 80, textAlignVertical: 'top' },
-  addButton: { backgroundColor: '#2d6a4f', padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 4 },
+  addButton: { backgroundColor: ThemeColors.button, padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 4 },
   addButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
   cancelText: { textAlign: 'center', marginTop: 12, color: '#999', fontSize: 14 },
 });
