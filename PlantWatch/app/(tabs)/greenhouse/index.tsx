@@ -97,7 +97,7 @@ export default function GreenhouseScreen() {
                                 <TouchableOpacity
                                     style={styles.greenhouseCard}
                                     onPress={() => router.push({
-                                        pathname: '/greenhouse/plants',
+                                        pathname: '/greenhouse/dashboard',
                                         params: {
                                             greenhouse_id: g.greenhouse_id,
                                             greenhouse_name: g.name,

@@ -1,30 +1,48 @@
-import { useCallback, useState } from 'react';
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useState, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import {
-  Alert,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
-  useWindowDimensions,
+  ScrollView,
   View,
+  Alert,
+  useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { AddPlant } from '@/components/add-plant';
+import { ThemedView } from '@/components/themed-view';
 import { GreenhouseMenu } from '@/components/greenhouse-menu';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { getGreenhousePlants, deleteGreenhousePlant } from '@/services/plant';
 import { Plant } from '@/interfaces/plant';
 
-export default function PlantsScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
+const MOCK_TEMP = 70;
+const MOCK_HUMIDITY = 65;
+const MOCK_SOIL_MOISTURE = 42;
+const LAST_UPDATED = new Date().toLocaleString();
+
+function ConditionCard({ label, value, unit }: { label: string; value: number; unit: string }) {
   const { width, height } = useWindowDimensions();
   const styles = getStyles(width, height);
-  const { greenhouse_id, greenhouse_name } = useLocalSearchParams<{
+  return (
+    <View style={styles.conditionCard}>
+      <ThemedText style={styles.conditionLabel}>{label}</ThemedText>
+      <ThemedText style={styles.conditionValue}>{value}{unit}</ThemedText>
+    </View>
+  );
+}
+
+export default function GreenhouseDashboardScreen() {
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
+  const { greenhouse_id, greenhouse_name, from } = useLocalSearchParams<{
     greenhouse_id: string;
     greenhouse_name: string;
+    from?: string;
   }>();
 
   const [plants, setPlants] = useState<Plant[]>([]);
@@ -65,26 +83,34 @@ export default function PlantsScreen() {
   const handlePlantPress = (plant: Plant) => {
     router.push({
       pathname: '/greenhouse/plant',
-      params: {
-        plantData: JSON.stringify(plant),
-      },
+      params: { plantData: JSON.stringify(plant) },
     });
   };
 
   return (
     <ThemedView style={styles.container}>
+      <Stack.Screen options={{ animation: from === 'menu' ? 'fade' : 'default' }} />
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <GreenhouseMenu
           greenhouse_id={greenhouse_id}
           greenhouse_name={greenhouse_name}
-          currentPage="plants"
+          currentPage="dashboard"
         />
         <ThemedText style={styles.headerTitle}>{greenhouse_name}</ThemedText>
         <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
+        <ThemedText style={styles.lastUpdated}>Last updated: {LAST_UPDATED}</ThemedText>
+
+        <ThemedText style={styles.sectionLabel}>CONDITIONS</ThemedText>
+        <View style={styles.conditionsRow}>
+          <ConditionCard label="Temp" value={MOCK_TEMP} unit="°F" />
+          <ConditionCard label="Humidity" value={MOCK_HUMIDITY} unit="%" />
+          <ConditionCard label="Soil" value={MOCK_SOIL_MOISTURE} unit="%" />
+        </View>
+
         <ThemedText style={styles.sectionLabel}>PLANTS ({plants.length})</ThemedText>
         {loading ? (
           <ThemedText style={styles.emptyText}>Loading...</ThemedText>
@@ -147,12 +173,42 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     padding: width * 0.041,
     paddingBottom: height * 0.118,
   },
+  lastUpdated: {
+    fontSize: 11,
+    color: '#999',
+    marginBottom: 16,
+    textAlign: 'right',
+  },
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
     color: '#999',
     marginBottom: 8,
     letterSpacing: 1,
+  },
+  conditionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 24,
+  },
+  conditionCard: {
+    flex: 1,
+    backgroundColor: ThemeColors.inputBackground,
+    borderRadius: 10,
+    padding: width * 0.036,
+    alignItems: 'center',
+  },
+  conditionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: ThemeColors.sectionHeader,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  conditionValue: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: ThemeColors.button,
   },
   emptyText: {
     textAlign: 'center',

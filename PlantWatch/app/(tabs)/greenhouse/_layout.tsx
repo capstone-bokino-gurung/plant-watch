@@ -10,7 +10,7 @@ export default function GreenhouseLayout() {
         }} 
       />
       <Stack.Screen
-        name="plants"
+        name="dashboard"
         options={{
             headerShown: false
         }}
@@ -18,7 +18,15 @@ export default function GreenhouseLayout() {
       <Stack.Screen
         name="plant"
         options={{
-            headerShown: false
+            headerShown: false,
+            animation: 'fade'
+        }}
+      />
+      <Stack.Screen
+        name="plants"
+        options={{
+            headerShown: false,
+            animation: 'fade'
         }}
       />
     </Stack>

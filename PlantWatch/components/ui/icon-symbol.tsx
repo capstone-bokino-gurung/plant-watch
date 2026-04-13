@@ -22,6 +22,8 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'square.and.arrow.up': 'file-upload',
   'pencil': 'edit',
+  'line.3.horizontal': 'menu',
+  'arrow.right.arrow.left': 'swap-horiz',
 } as IconMapping;
 
 /**
