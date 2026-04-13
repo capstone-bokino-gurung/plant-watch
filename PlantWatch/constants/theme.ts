@@ -18,7 +18,7 @@ export const Colors = {
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
-    button: '#1c4415',
+    button: '#24571b',
     link: '#079231',
     header: '#2d6a4f',
     sectionHeader: '#999'
@@ -32,7 +32,7 @@ export const Colors = {
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
-    button: '#1c4415',
+    button: '#24571b',
     link: '#079231',
     header: '#ffffff',
     sectionHeader: '#ffffff'

@@ -5,7 +5,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { CameraMode, CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 
 export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -14,6 +14,8 @@ export default function ScanScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const focused = useIsFocused();
   const { session, user } = useAuth();
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
 
   if (!permission) {
     return null;
@@ -56,8 +58,8 @@ export default function ScanScreen() {
     <ThemedView style={styles.cameraContainer}>
         {/* only show if authenticated */}
         {session && user && (
-        <TouchableOpacity 
-            style={styles.scanHistoryButton} 
+        <TouchableOpacity
+            style={styles.scanHistoryButton}
             onPress={route_to_history}
         >
             <Text style={styles.scanHistoryButtonText}>Scan History</Text>
@@ -100,16 +102,16 @@ export default function ScanScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (width: number, height: number) => StyleSheet.create({
   centeredContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: width * 0.051,
   },
   permissionButton: {
     marginTop: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: width * 0.051,
     paddingVertical: 10,
     backgroundColor: '#1c4415',
     borderRadius: 8,
@@ -124,9 +126,9 @@ const styles = StyleSheet.create({
   },
   scanHistoryButton: {
     position: 'absolute',
-    top: 50,
-    left: 20,
-    paddingHorizontal: 16,
+    top: height * 0.059,
+    left: width * 0.051,
+    paddingHorizontal: width * 0.041,
     paddingVertical: 8,
     zIndex: 10,
     borderRadius: 20,
@@ -142,28 +144,28 @@ const styles = StyleSheet.create({
   },
   shutterContainer: {
     position: "absolute",
-    bottom: 20,
+    bottom: height * 0.024,
     backgroundColor: "transparent",
     left: 0,
     width: "100%",
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
-    paddingHorizontal: 30,
+    paddingHorizontal: width * 0.077,
   },
   shutterBtn: {
     backgroundColor: "transparent",
     borderWidth: 5,
     borderColor: "white",
-    width: 85,
-    height: 85,
-    borderRadius: 45,
+    width: width * 0.218,
+    height: width * 0.218,
+    borderRadius: width * 0.115,
     alignItems: "center",
     justifyContent: "center",
   },
   shutterBtnInner: {
-    width: 70,
-    height: 70,
-    borderRadius: 50,
+    width: width * 0.179,
+    height: width * 0.179,
+    borderRadius: width * 0.090,
   },
 });

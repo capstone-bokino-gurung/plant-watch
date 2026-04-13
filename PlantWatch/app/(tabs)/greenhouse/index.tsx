@@ -13,6 +13,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -22,12 +23,14 @@ import { Greenhouse } from '@/interfaces/greenhouse';
 export default function GreenhouseScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
+    const { width, height } = useWindowDimensions();
+    const styles = getStyles(width, height);
     const [greenhouses, setGreenhouses] = useState<Greenhouse[]>([]);
     const [loadingFetch, setLoadingFetch] = useState(true);
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [newGreenhouseName, setNewGreenhouseName] = useState('');
     const {session, user, loading} = useAuth();
-  
+
 
     useEffect(() => {
         if (loading) return;
@@ -49,7 +52,7 @@ export default function GreenhouseScreen() {
         if (!newGreenhouseName || !user) return;
 
         const { data, error } = await createGreenhouse(user.id, newGreenhouseName);
-        
+
         if (error) {
             Alert.alert('Error', typeof error === 'string' ? error : error.message);
         } else {
@@ -147,7 +150,7 @@ export default function GreenhouseScreen() {
         return (
             <ThemedView style={styles.centeredContainer}>
                 <TouchableOpacity onPress={() => router.push('/profile')}>
-                    <ThemedText>Want to manage your plants?</ThemedText>
+                    <ThemedText style={{fontSize: 20}}>Want to manage your plants?</ThemedText>
                     <Text style={styles.login}>Login.</Text>
                 </TouchableOpacity>
             </ThemedView>
@@ -155,7 +158,7 @@ export default function GreenhouseScreen() {
     }
 }
 
-const styles = StyleSheet.create({
+const getStyles = (width: number, height: number) => StyleSheet.create({
   centeredContainer: {
     flex: 1,
     alignItems: "center",
@@ -163,28 +166,120 @@ const styles = StyleSheet.create({
   },
   login: {
     color: ThemeColors.link,
-    fontSize: 16,
+    fontSize: 20,
     textAlign: 'center',
     marginTop: 10,
   },
-  container: { flex: 1 },
-  header: { paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: ThemeColors.inputBackground },
-  headerTitle: { fontSize: 22, fontWeight: 'bold', color: ThemeColors.header },
-  content: { padding: 16, paddingBottom: 100 },
-  emptyText: { textAlign: 'center', marginTop: 40, color: '#999', fontSize: 16 },
-  greenhouseRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  greenhouseCard: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: ThemeColors.inputBackground, borderRadius: 12, padding: 16 },
-  greenhouseName: { flex: 1, fontSize: 16, fontWeight: '600' },
-  greenhouseArrow: { fontSize: 18, color: '#2d6a4f' },
-  deleteButton: { padding: 8, marginLeft: 8 },
-  deleteText: { fontSize: 20 },
-  fab: { position: 'absolute', right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: '#2d6a4f', alignItems: 'center', justifyContent: 'center', elevation: 4 },
-  fabText: { color: '#fff', fontSize: 32, lineHeight: 36 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modal: { backgroundColor: '#fff', borderRadius: 12, padding: 24, width: '80%' },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
-  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, marginBottom: 8 },
-  createButton: { backgroundColor: ThemeColors.button, padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 12 },
-  createButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  cancelText: { textAlign: 'center', marginTop: 12, color: '#999', fontSize: 14 },
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: width * 0.041,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: ThemeColors.inputBackground,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: ThemeColors.header,
+  },
+  content: {
+    padding: width * 0.041,
+    paddingBottom: height * 0.118,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: '#999',
+    fontSize: 16,
+  },
+  greenhouseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  greenhouseCard: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: ThemeColors.inputBackground,
+    borderRadius: 12,
+    padding: 16,
+  },
+  greenhouseName: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  greenhouseArrow: {
+    fontSize: 18,
+    color: '#2d6a4f',
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
+  },
+  deleteText: {
+    fontSize: 20,
+  },
+  fab: {
+    position: 'absolute',
+    right: width * 0.062,
+    width: width * 0.144,
+    height: width * 0.144,
+    borderRadius: width * 0.072,
+    backgroundColor: '#2d6a4f',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+  },
+  fabText: {
+    color: '#fff',
+    fontSize: 32,
+    lineHeight: 36,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modal: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: width * 0.062,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  createButton: {
+    backgroundColor: ThemeColors.button,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  createButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  cancelText: {
+    textAlign: 'center',
+    marginTop: 12,
+    color: '#999',
+    fontSize: 14,
+  },
 });

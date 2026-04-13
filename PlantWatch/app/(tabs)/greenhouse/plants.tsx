@@ -6,6 +6,7 @@ import {
   ScrollView,
   View,
   Alert,
+  useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -23,6 +24,8 @@ const LAST_UPDATED = new Date().toLocaleString();
 
 
 function ConditionCard({ label, value, unit }: { label: string; value: number; unit: string }) {
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
   return (
     <View style={styles.conditionCard}>
       <ThemedText style={styles.conditionLabel}>{label}</ThemedText>
@@ -34,6 +37,8 @@ function ConditionCard({ label, value, unit }: { label: string; value: number; u
 export default function GreenhouseDashboardScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
   const { greenhouse_id, greenhouse_name } = useLocalSearchParams<{
     greenhouse_id: string;
     greenhouse_name: string;
@@ -144,35 +149,172 @@ export default function GreenhouseDashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, backgroundColor: ThemeColors.inputBackground},
-  backButton: { padding: 8, width: 80 },
-  backText: { color: '#2d6a4f', fontSize: 16 },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: 18, fontWeight: 'bold', color: '#2d6a4f' },
-  content: { padding: 16, paddingBottom: 100 },
-  lastUpdated: { fontSize: 11, color: '#999', marginBottom: 16, textAlign: 'right' },
-  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#999', marginBottom: 8, letterSpacing: 1 },
-  conditionsRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
-  conditionCard: { flex: 1, backgroundColor: ThemeColors.inputBackground, borderRadius: 10, padding: 14, alignItems: 'center' },
-  conditionLabel: { fontSize: 11, fontWeight: '700', color: ThemeColors.sectionHeader, letterSpacing: 1, marginBottom: 4 },
-  conditionValue: { fontSize: 22, fontWeight: 'bold', color: ThemeColors.button },
-  emptyText: { textAlign: 'center', marginTop: 20, color: '#999', fontSize: 16 },
-  plantCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: ThemeColors.inputBackground, borderRadius: 10, padding: 14, marginBottom: 12 },
-  plantInfo: { flex: 1 },
-  plantName: { fontSize: 16, fontWeight: 'bold' },
-  plantScientific: { fontSize: 13, fontStyle: 'italic', color: '#666', marginTop: 2 },
-  plantNotes: { fontSize: 13, color: '#888', marginTop: 4 },
-  deleteButton: { padding: 8 },
-  deleteText: { fontSize: 20 },
-  fab: { position: 'absolute', right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: ThemeColors.button, alignItems: 'center', justifyContent: 'center', elevation: 4 },
-  fabText: { color: '#fff', fontSize: 32, lineHeight: 36 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modal: { backgroundColor: '#fff', borderRadius: 12, padding: 24, width: '85%' },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
-  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, marginBottom: 10 },
-  notesInput: { height: 80, textAlignVertical: 'top' },
-  addButton: { backgroundColor: ThemeColors.button, padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 4 },
-  addButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  cancelText: { textAlign: 'center', marginTop: 12, color: '#999', fontSize: 14 },
+const getStyles = (width: number, height: number) => StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: width * 0.041,
+    paddingBottom: 12,
+    backgroundColor: ThemeColors.inputBackground,
+  },
+  backButton: {
+    padding: 8,
+    width: 80,
+  },
+  backText: {
+    color: '#2d6a4f',
+    fontSize: 16,
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2d6a4f',
+  },
+  content: {
+    padding: width * 0.041,
+    paddingBottom: height * 0.118,
+  },
+  lastUpdated: {
+    fontSize: 11,
+    color: '#999',
+    marginBottom: 16,
+    textAlign: 'right',
+  },
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#999',
+    marginBottom: 8,
+    letterSpacing: 1,
+  },
+  conditionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 24,
+  },
+  conditionCard: {
+    flex: 1,
+    backgroundColor: ThemeColors.inputBackground,
+    borderRadius: 10,
+    padding: width * 0.036,
+    alignItems: 'center',
+  },
+  conditionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: ThemeColors.sectionHeader,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  conditionValue: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: ThemeColors.button,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#999',
+    fontSize: 16,
+  },
+  plantCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: ThemeColors.inputBackground,
+    borderRadius: 10,
+    padding: width * 0.036,
+    marginBottom: 12,
+  },
+  plantInfo: {
+    flex: 1,
+  },
+  plantName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  plantScientific: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    color: '#666',
+    marginTop: 2,
+  },
+  plantNotes: {
+    fontSize: 13,
+    color: '#888',
+    marginTop: 4,
+  },
+  deleteButton: {
+    padding: 8,
+  },
+  deleteText: {
+    fontSize: 20,
+  },
+  fab: {
+    position: 'absolute',
+    right: width * 0.062,
+    width: width * 0.144,
+    height: width * 0.144,
+    borderRadius: width * 0.072,
+    backgroundColor: ThemeColors.button,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+  },
+  fabText: {
+    color: '#fff',
+    fontSize: 32,
+    lineHeight: 36,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modal: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: width * 0.062,
+    width: '85%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  notesInput: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  addButton: {
+    backgroundColor: ThemeColors.button,
+    padding: width * 0.036,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  cancelText: {
+    textAlign: 'center',
+    marginTop: 12,
+    color: '#999',
+    fontSize: 14,
+  },
 });

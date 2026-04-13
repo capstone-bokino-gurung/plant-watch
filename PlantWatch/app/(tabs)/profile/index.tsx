@@ -7,10 +7,12 @@ import { BackButton } from '@/components/ui/back-button';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from "react";
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 
 export default function Profile() {
   const { session, user, loading, signOut } = useAuth();
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
   const screens = {
     LOGIN: "login",
     REGISTER: "register",
@@ -67,7 +69,7 @@ export default function Profile() {
 
 }
 
-const styles = StyleSheet.create({
+const getStyles = (width: number, height: number) => StyleSheet.create({
   flexContainer: {
     flex: 1,
   },
@@ -79,7 +81,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     flex: 1,
     alignItems: 'center',
-    paddingBottom: 48,
+    paddingBottom: height * 0.057,
   },
   userSection: {
     flex: 1,
@@ -88,9 +90,9 @@ const styles = StyleSheet.create({
     paddingBottom: '30%',
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: width * 0.256,
+    height: width * 0.256,
+    borderRadius: width * 0.128,
     marginBottom: 16,
   },
   name: {
@@ -108,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColors.button,
     borderRadius: 10,
     paddingVertical: 16,
-    paddingHorizontal: 48,
+    paddingHorizontal: width * 0.123,
     alignItems: 'center',
     width: '80%',
   },

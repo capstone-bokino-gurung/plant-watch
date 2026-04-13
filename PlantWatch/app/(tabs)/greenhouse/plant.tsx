@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import React, { useState, useEffect } from 'react';
-import { ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { ScrollView, TouchableOpacity, StyleSheet, Alert, useWindowDimensions } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { getUserGreenhouses } from '@/services/greenhouse';
@@ -29,6 +29,8 @@ export default function PlantScreen() {
   const [wateringHistory, setWateringHistory] = useState<WateringRecord[]>([]);
   const [linkedDevices, setLinkedDevices] = useState<LinkedDevice[]>([]);
   const { session, user } = useAuth();
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
 
   useEffect(() => {
     fetchGreenhouses();
@@ -141,34 +143,110 @@ export default function PlantScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  contentContainer: { padding: 20, paddingTop: 120 },
-  topSection: { flexDirection: 'row', marginBottom: 24, height: 180, borderRadius: 12 },
-  image: { width: 120, height: 180, borderRadius: 12, marginRight: 16 },
-  infoRows: { flex: 1, justifyContent: 'space-between' },
-  row: { flex: 1, justifyContent: 'center' },
-  label: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
-  value: { fontSize: 17, fontWeight: '600' },
-  descriptionContainer: { borderRadius: 12, padding: 18, minHeight: 150 },
-  descriptionLabel: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
-  descriptionText: { fontSize: 16, lineHeight: 24, marginBottom: 5 },
+const getStyles = (width: number, height: number) => StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  contentContainer: {
+    padding: width * 0.051,
+    paddingTop: height * 0.142,
+  },
+  topSection: {
+    flexDirection: 'row',
+    marginBottom: 24,
+    height: height * 0.213,
+    borderRadius: 12,
+  },
+  image: {
+    width: width * 0.308,
+    height: height * 0.213,
+    borderRadius: 12,
+    marginRight: width * 0.041,
+  },
+  infoRows: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  row: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#888888',
+    marginBottom: 3,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  value: {
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  descriptionContainer: {
+    borderRadius: 12,
+    padding: 18,
+    minHeight: 150,
+  },
+  descriptionLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#888888',
+    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  descriptionText: {
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 5,
+  },
   editButton: {
     position: 'absolute',
-    top: 50,
-    right: 20,
-    width: 44,
-    height: 44,
+    top: height * 0.059,
+    right: width * 0.051,
+    width: width * 0.113,
+    height: width * 0.113,
     zIndex: 10,
-    borderRadius: 22,
+    borderRadius: width * 0.056,
     backgroundColor: '#1c4415',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  dropdownHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderTopWidth: 1, borderTopColor: '#e0e0e0', marginTop: 8 },
-  dropdownLabel: { fontSize: 13, fontWeight: '600', color: '#888888', textTransform: 'uppercase', letterSpacing: 0.5 },
-  dropdownButton: { fontSize: 18, color: '#888888' },
-  dropdownContent: { paddingBottom: 8 },
-  dropdownEmpty: { fontSize: 13, color: '#aaa', textAlign: 'center', paddingVertical: 12, letterSpacing: 0.5 },
-  dropdownItem: { fontSize: 15, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
+  dropdownHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    marginTop: 8,
+  },
+  dropdownLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#888888',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  dropdownButton: {
+    fontSize: 18,
+    color: '#888888',
+  },
+  dropdownContent: {
+    paddingBottom: 8,
+  },
+  dropdownEmpty: {
+    fontSize: 13,
+    color: '#aaa',
+    textAlign: 'center',
+    paddingVertical: 12,
+    letterSpacing: 0.5,
+  },
+  dropdownItem: {
+    fontSize: 15,
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
 });

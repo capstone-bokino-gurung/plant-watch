@@ -4,7 +4,10 @@ import {
   Platform,
   StyleSheet,
   TextInput,
+  Text,
+  Image,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 
 
@@ -18,6 +21,8 @@ export function RegisterScreen() {
     const [password, setPassword] = useState('');
     const [first_name, setFirstName] = useState('');
     const [last_name, setLastName] = useState('');
+    const { width, height } = useWindowDimensions();
+    const styles = getStyles(width, height);
 
     const { signInWithEmail, signUpWithEmail, loading } = useAuth()
     return (
@@ -26,8 +31,9 @@ export function RegisterScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       {/* Logo */}
-      <ThemedView>
-
+      <ThemedView style={styles.logoContainer}>
+        <Image source={require('@/assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
+        <Text style={styles.logoText}>plantwatch</Text>
       </ThemedView>
       
       {/* Center Section */}
@@ -78,14 +84,30 @@ export function RegisterScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (width: number, height: number) => StyleSheet.create({
   container: {
     flex: 1,
   },
   formContainer: {
     flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 32,
+    justifyContent: 'flex-start',
+    paddingTop: 24,
+    paddingHorizontal: width * 0.082,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    paddingTop: height * 0.12,
+    paddingBottom: height * 0.035,
+  },
+  logo: {
+    width: width * 0.26,
+    height: width * 0.26,
+  },
+  logoText: {
+    paddingTop: 20,
+    fontSize: width * 0.077,
+    color: ThemeColors.button,
+    fontWeight: '600'
   },
   input: {
     backgroundColor: ThemeColors.inputBackground,
@@ -114,7 +136,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 40,
+    paddingBottom: height * 0.047,
   },
   footerText: {
     fontSize: 14,

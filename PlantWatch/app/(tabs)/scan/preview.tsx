@@ -8,13 +8,15 @@ import { Image } from 'expo-image';
 import { SaveFormat, useImageManipulator } from 'expo-image-manipulator';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 
 export default function PreviewScreen() {
     const { imageUri } = useLocalSearchParams<{ imageUri: string }>(); // gets from router params
     const [isProcessing, setIsProcessing] = useState(false);
     const scanContext = useImageManipulator(imageUri ?? '');
     const { session, user } = useAuth();
+    const { width, height } = useWindowDimensions();
+    const styles = getStyles(width, height);
 
     // Convert to JPEG, 90% compression
     const reformatImage = async (uri: string) => {
@@ -106,7 +108,7 @@ export default function PreviewScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (width: number, height: number) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -132,9 +134,9 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     position: 'absolute',
-    bottom: 40,
-    left: 20,
-    right: 20,
+    bottom: height * 0.047,
+    left: width * 0.051,
+    right: width * 0.051,
     backgroundColor: '#1c4415',
     paddingVertical: 16,
     borderRadius: 12,
