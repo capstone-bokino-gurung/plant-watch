@@ -29,6 +29,20 @@ export default function GreenhouseLayout() {
             animation: 'fade'
         }}
       />
+      <Stack.Screen
+        name="devices"
+        options={{
+            headerShown: false,
+            animation: 'fade'
+        }}
+      />
+      <Stack.Screen
+        name="device"
+        options={{
+            headerShown: false,
+            animation: 'fade'
+        }}
+      />
     </Stack>
   );
 }

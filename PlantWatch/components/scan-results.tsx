@@ -1,7 +1,7 @@
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { Image } from 'expo-image';
 import React, { useState, useEffect } from 'react';
-import { Modal, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Modal, ScrollView, TouchableOpacity, StyleSheet, Alert, useWindowDimensions } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { getUserGreenhouses } from '@/services/greenhouse';
@@ -30,6 +30,8 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
   const [selectedGreenhouseId, setSelectedGreenhouseId] = useState<string | null>(null);
   const [addPlantModalOpen, setAddPlantModalOpen] = useState(false);
   const { session, user } = useAuth();
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
   
   useEffect(() => {
     fetchGreenhouses();
@@ -145,28 +147,28 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (width: number, height: number) => StyleSheet.create({
   container: { flex: 1 },
-  contentContainer: { padding: 20, paddingTop: 120 },
-  topSection: { flexDirection: 'row', marginBottom: 24, height: 180, borderRadius: 12 },
-  image: { width: 120, height: 180, borderRadius: 12, marginRight: 16 },
+  contentContainer: { padding: width * 0.051, paddingTop: height * 0.142 },
+  topSection: { flexDirection: 'row', marginBottom: height * 0.028, height: height * 0.213, borderRadius: 12 },
+  image: { width: width * 0.308, height: height * 0.213, borderRadius: 12, marginRight: width * 0.041 },
   infoRows: { flex: 1, justifyContent: 'space-between' },
   row: { flex: 1, justifyContent: 'center' },
   label: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
   value: { fontSize: 17, fontWeight: '600' },
-  descriptionContainer: { borderRadius: 12, padding: 18, minHeight: 150 },
+  descriptionContainer: { borderRadius: 12, padding: width * 0.046, minHeight: height * 0.178 },
   descriptionLabel: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
   descriptionText: { fontSize: 16, lineHeight: 24, marginBottom: 5 },
-  addButton: { backgroundColor: '#2d6a4f', padding: 16, borderRadius: 12, alignItems: 'center', marginTop: 16, marginBottom: 40 },
+  addButton: { backgroundColor: '#2d6a4f', padding: height * 0.019, borderRadius: 12, alignItems: 'center', marginTop: height * 0.019, marginBottom: height * 0.047 },
   addButtonDone: { backgroundColor: '#888' },
   addButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modal: { borderRadius: 12, padding: 24, width: '80%' },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
+  modal: { borderRadius: 12, padding: width * 0.062, width: '80%' },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: height * 0.019 },
   emptyText: { color: '#999', textAlign: 'center', marginBottom: 12 },
-  greenhouseItem: { padding: 14, borderRadius: 8, backgroundColor: ThemeColors.inputBackground, marginBottom: 8 },
+  greenhouseItem: { padding: height * 0.0166, borderRadius: 8, backgroundColor: ThemeColors.inputBackground, marginBottom: height * 0.009 },
   greenhouseItemText: { fontSize: 16 },
-  cancelText: { textAlign: 'center', marginTop: 8, color: '#999', fontSize: 14 },
+  cancelText: { textAlign: 'center', marginTop: height * 0.009, color: '#999', fontSize: 14 },
 });
 
 // const styles = StyleSheet.create({

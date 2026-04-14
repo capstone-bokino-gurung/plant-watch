@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, View, TextInput, TouchableOpacity, StyleSheet, Alert, Image, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { Modal, View, TextInput, TouchableOpacity, StyleSheet, Alert, Image, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard, useWindowDimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -38,6 +38,8 @@ export function AddPlant({
   plant,
 }: AddPlantProps) {
   const { user } = useAuth();
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
   const isEditMode = !!plant;
 
   const [commonName, setCommonName] = useState('');
@@ -219,18 +221,18 @@ export function AddPlant({
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (width: number, height: number) => StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modal: { backgroundColor: '#fff', borderRadius: 12, padding: 24, width: '85%' },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
-  imageRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
-  image: { width: 120, height: 160, borderRadius: 8, backgroundColor: '#eee' },
-  uploadButton: { marginLeft: 20, alignItems: 'center', gap: 4 },
+  modal: { backgroundColor: '#fff', borderRadius: 12, padding: width * 0.062, width: '85%' },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: height * 0.019 },
+  imageRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: height * 0.019 },
+  image: { width: width * 0.308, height: width * 0.41, borderRadius: 8, backgroundColor: '#eee' },
+  uploadButton: { marginLeft: width * 0.051, alignItems: 'center', gap: 4 },
   uploadText: { fontSize: 12, color: ThemeColors.button },
   fieldLabel: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
-  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, marginBottom: 10 },
-  notesInput: { height: 80, textAlignVertical: 'top' },
-  addButton: { backgroundColor: ThemeColors.button, padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 4 },
+  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: height * 0.014, fontSize: 16, marginBottom: height * 0.012 },
+  notesInput: { height: height * 0.095, textAlignVertical: 'top' },
+  addButton: { backgroundColor: ThemeColors.button, padding: height * 0.0166, borderRadius: 8, alignItems: 'center', marginTop: height * 0.005 },
   addButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  cancelText: { textAlign: 'center', marginTop: 12, color: '#999', fontSize: 14 },
+  cancelText: { textAlign: 'center', marginTop: height * 0.014, color: '#999', fontSize: 14 },
 });
