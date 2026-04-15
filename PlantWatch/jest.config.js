@@ -16,8 +16,9 @@ module.exports = {
   
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    '^expo-file-system$': '<rootDir>/__mocks__/expo-file-system.js',
   },
-  
+
   collectCoverageFrom: [
     'services/**/*.{ts,tsx}',
     'app/**/*.{ts}',
