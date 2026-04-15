@@ -54,7 +54,7 @@ export default function HistoryScreen() {
             }
 
             try {
-                const scans = await getScans(user.id);
+                const scans = await getScans();
                 setScanHistory(scans);
             } catch (error) {
                 console.error('Failed to load scans:', error);

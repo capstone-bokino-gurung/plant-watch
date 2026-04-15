@@ -21,7 +21,8 @@ export type GreenhousePage =
   | 'users'
   | 'userRoles'
   | 'notifications'
-  | 'settings';
+  | 'settings'
+  | 'activity-log';
 
 interface GreenhouseMenuProps {
   greenhouse_id: string;
@@ -33,6 +34,7 @@ const MENU_ITEMS: { label: string; page: GreenhousePage; pathname: string }[] = 
   { label: 'Dashboard',     page: 'dashboard',     pathname: '/greenhouse/dashboard' },
   { label: 'Plants',        page: 'plants',        pathname: '/greenhouse/plants' },
   { label: 'Devices',       page: 'devices',       pathname: '/greenhouse/devices' },
+  { label: 'Activity Log',       page: 'activity-log',  pathname: '/greenhouse/activity-log' },
   { label: 'Users',         page: 'users',         pathname: '/greenhouse/users' },
   { label: 'User Roles',    page: 'userRoles',     pathname: '/greenhouse/user-roles' },
   { label: 'Notifications', page: 'notifications', pathname: '/greenhouse/notifications' },

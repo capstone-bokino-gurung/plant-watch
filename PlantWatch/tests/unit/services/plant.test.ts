@@ -21,11 +21,22 @@ jest.mock('@/util/supabase', () => ({
     storage: {
         from: jest.fn(),
     },
+    auth: {
+      getUser: jest.fn(),
+    },
   },
 }));
 
+const mockUserId = 'u1';
 const mockFrom = supabase.from as jest.Mock;
 const mockStorageFrom = supabase.storage.from as jest.Mock;
+
+beforeAll(() => {
+  (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+    data: { user: { id: mockUserId } },
+    error: null,
+  });
+});
 
 function buildChain(result: { data?: unknown; error?: unknown; count?: unknown }) {
   const chain: Record<string, jest.Mock> = {};
@@ -267,10 +278,10 @@ describe('getScans', () => {
         const chain = buildChain({ data: mockScans, error: null });
         mockFrom.mockReturnValue(chain);
 
-        const data = await getScans('u1');
+        const data = await getScans();
 
         expect(mockFrom).toHaveBeenCalledWith('scan_history');
-        expect(chain.eq).toHaveBeenCalledWith('user_id', 'u1');
+        expect(chain.eq).toHaveBeenCalledWith('user_id', mockUserId);
         expect(data).toHaveLength(2);
         expect(data[0].common_name).toBe('Mint');
     });
@@ -279,7 +290,7 @@ describe('getScans', () => {
     const chain = buildChain({ data: null, error: { message: 'Query failed' } });
     mockFrom.mockReturnValue(chain);
  
-    await expect(getScans('u1')).rejects.toThrow('Failed to get user scans: Query failed');
+    await expect(getScans()).rejects.toThrow('Failed to get user scans: Query failed');
   });
 });
 
@@ -296,7 +307,7 @@ describe('deleteScan', () => {
     const storageChain = buildStorageChain({ error: null });
     mockStorageFrom.mockReturnValue(storageChain);
  
-    await expect(deleteScan('u1', 's1')).resolves.not.toThrow();
+    await expect(deleteScan('s1')).resolves.not.toThrow();
  
     expect(storageChain.remove).toHaveBeenCalled();
     expect(deleteChain.delete).toHaveBeenCalled();
@@ -306,7 +317,7 @@ describe('deleteScan', () => {
     const chain = buildChain({ data: null, error: { message: 'Not found' } });
     mockFrom.mockReturnValue(chain);
  
-    await expect(deleteScan('u1', 's1')).rejects.toThrow('Failed to fetch scan: Not found');
+    await expect(deleteScan('s1')).rejects.toThrow('Failed to fetch scan: Not found');
   });
  
   it('throws when storage deletion fails', async () => {
@@ -317,7 +328,7 @@ describe('deleteScan', () => {
     const storageChain = buildStorageChain({ error: { message: 'Storage error' } });
     mockStorageFrom.mockReturnValue(storageChain);
  
-    await expect(deleteScan('u1', 's1')).rejects.toThrow('Failed to delete image: Storage error');
+    await expect(deleteScan('s1')).rejects.toThrow('Failed to delete image: Storage error');
   });
 });
  

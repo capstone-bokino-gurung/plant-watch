@@ -5,7 +5,7 @@ import { supabase } from '@/util/supabase';
 const DEVICES_TABLE = 'devices';
 const HISTORY_TABLE = 'device_history';
 
-export async function getGreenhouseDevices(greenhouse_id: string) {
+export async function getDevices(greenhouse_id: string) {
   const { data, error } = await supabase
     .from(DEVICES_TABLE)
     .select('*')

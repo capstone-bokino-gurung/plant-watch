@@ -33,25 +33,26 @@ export default function GreenhouseScreen() {
 
 
     useEffect(() => {
-        if (loading) return;
+        if (loading || !session || !user) return;
         fetchGreenhouses();
-        setLoadingFetch(false);
-    }, [loading]);
+    }, [loading, session, user]);
 
     async function fetchGreenhouses() {
         if (!session || !user) return;
-        const { data, error } = await getUserGreenhouses(user.id);
+        setLoadingFetch(true);
+        const { data, error } = await getUserGreenhouses();
         if (error) {
             Alert.alert('Error', error);
         } else {
             setGreenhouses(data || []);
         }
+        setLoadingFetch(false);
     }
 
     async function createGreenhouseReact() {
         if (!newGreenhouseName || !user) return;
 
-        const { data, error } = await createGreenhouse(user.id, newGreenhouseName);
+        const { data, error } = await createGreenhouse(newGreenhouseName);
 
         if (error) {
             Alert.alert('Error', typeof error === 'string' ? error : error.message);

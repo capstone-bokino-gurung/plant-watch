@@ -43,6 +43,13 @@ export default function GreenhouseLayout() {
             animation: 'fade'
         }}
       />
+      <Stack.Screen
+        name="activity-log"
+        options={{
+            headerShown: false,
+            animation: 'fade',
+        }}
+      />
     </Stack>
   );
 }

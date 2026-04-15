@@ -1,4 +1,4 @@
-import { getGreenhouseDevices, createDevice, deleteDevice } from '@/services/device';
+import { getDevices, createDevice, deleteDevice } from '@/services/device';
 import { supabase } from '@/util/supabase';
 
 // Mock Supabase
@@ -27,14 +27,14 @@ describe('Device Service - Unit Tests', () => {
     jest.clearAllMocks();
   });
 
-  describe('getGreenhouseDevices', () => {
+  describe('getDevices', () => {
     it('should return devices for the given greenhouse', async () => {
       (supabase.from as jest.Mock).mockReturnValueOnce({
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockResolvedValue({ data: [mockDevice], error: null }),
       });
 
-      const result = await getGreenhouseDevices(mockGreenhouseId);
+      const result = await getDevices(mockGreenhouseId);
 
       expect(result.error).toBeNull();
       expect(result.data).toEqual([mockDevice]);
@@ -46,7 +46,7 @@ describe('Device Service - Unit Tests', () => {
         eq: jest.fn().mockResolvedValue({ data: [], error: null }),
       });
 
-      const result = await getGreenhouseDevices(mockGreenhouseId);
+      const result = await getDevices(mockGreenhouseId);
 
       expect(result.error).toBeNull();
       expect(result.data).toEqual([]);
@@ -60,7 +60,7 @@ describe('Device Service - Unit Tests', () => {
         eq: jest.fn().mockResolvedValue({ data: null, error: mockError }),
       });
 
-      const result = await getGreenhouseDevices(mockGreenhouseId);
+      const result = await getDevices(mockGreenhouseId);
 
       expect(result.data).toBeNull();
       expect(result.error).toEqual(mockError);

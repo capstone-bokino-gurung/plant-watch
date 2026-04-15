@@ -1,7 +1,11 @@
 import { Greenhouse } from '@/interfaces/greenhouse';
 import { supabase } from '@/util/supabase';
 
-export async function createGreenhouse(userId: string, greenhouseName: string) {
+export async function createGreenhouse(greenhouseName: string) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return { error: 'Not authenticated' };
+    const userId = user.id;
+
     // Check for duplicates WITHOUT using a join
     // First get all user's greenhouse IDs
     const { data: userPermissions, error: permError } = await supabase
@@ -40,11 +44,14 @@ export async function createGreenhouse(userId: string, greenhouseName: string) {
     return { data: data[0]?.greenhouse_id };
 }
 
-export async function getUserGreenhouses(userId: string) {
+export async function getUserGreenhouses() {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return { error: 'Not authenticated' };
+
     const { data, error } = await supabase
         .from('permissions')
         .select('greenhouses(greenhouse_id, name, created_at)')
-        .eq('user_id', userId);
+        .eq('user_id', user.id);
     
     if (error) return { error: 'There was an error retrieving your greenhouses from our database. Please try again later.'};
 

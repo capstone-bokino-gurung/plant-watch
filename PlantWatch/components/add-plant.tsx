@@ -103,7 +103,7 @@ export function AddPlant({
     let imageUrl: string | undefined = existingImageUrl ?? undefined;
     if (imageUri && user) {
       try {
-        imageUrl = await saveImageToDatabase(user.id, imageUri, PLANT_IMG_BUCKET);
+        imageUrl = await saveImageToDatabase(imageUri, PLANT_IMG_BUCKET);
       } catch {
         Alert.alert('Error', 'Failed to upload image.');
         return;

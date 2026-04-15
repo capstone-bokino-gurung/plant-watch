@@ -4,6 +4,7 @@ import { ScrollView, TouchableOpacity, StyleSheet, Alert, useWindowDimensions } 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { getUserGreenhouses } from '@/services/greenhouse';
+import { getPlantLogs } from '@/services/activity_log';
 import { useAuth } from '@/hooks/useAuth';
 import { Plant } from '@/interfaces/plant';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -14,7 +15,7 @@ import { AddPlant } from '@/components/add-plant';
 
 type Greenhouse = { greenhouse_id: string; name: string };
 
-type WateringRecord = { id: string; date: string; amount: string };
+type ActivityLog = { id: string; user_id: string; activity: string; time: string; notes: string };
 type LinkedDevice = { id: string; name: string; type: string };
 
 export default function PlantScreen() {
@@ -26,7 +27,7 @@ export default function PlantScreen() {
   const [greenhouses, setGreenhouses] = useState<Greenhouse[]>([]);
   const [wateringExpanded, setWateringExpanded] = useState(false);
   const [devicesExpanded, setDevicesExpanded] = useState(false);
-  const [wateringHistory, setWateringHistory] = useState<WateringRecord[]>([]);
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [linkedDevices, setLinkedDevices] = useState<LinkedDevice[]>([]);
   const { session, user } = useAuth();
   const { width, height } = useWindowDimensions();
@@ -34,7 +35,7 @@ export default function PlantScreen() {
 
   useEffect(() => {
     fetchGreenhouses();
-    fetchWateringHistory();
+    fetchActivityLogs();
     fetchLinkedDevices();
   }, []);
 
@@ -47,7 +48,7 @@ export default function PlantScreen() {
 
   async function fetchGreenhouses() {
       if (!session || !user) return;
-      const { data, error } = await getUserGreenhouses(user.id);
+      const { data, error } = await getUserGreenhouses();
       if (error) {
           Alert.alert('Error', error);
       } else {
@@ -55,9 +56,11 @@ export default function PlantScreen() {
       }
   }
 
-  async function fetchWateringHistory() {
-    // TODO: Fetch watering history from database
-    setWateringHistory([]);
+  async function fetchActivityLogs() {
+    if (!currentPlant) return;
+    const { data, error } = await getPlantLogs(currentPlant.plant_id);
+    if (error) Alert.alert('Error', error.message);
+    else setActivityLogs(data || []);
   }
 
   async function fetchLinkedDevices() {
@@ -101,15 +104,17 @@ export default function PlantScreen() {
           <ThemedText style={styles.descriptionLabel}>Notes:</ThemedText>
           <ThemedText style={styles.descriptionText}>{notes}</ThemedText>
           <TouchableOpacity style={styles.dropdownHeader} onPress={() => setWateringExpanded(prev => !prev)}>
-            <ThemedText style={styles.dropdownLabel}>Watering History</ThemedText>
+            <ThemedText style={styles.dropdownLabel}>Activity Logs</ThemedText>
             <ThemedText style={styles.dropdownButton}>{wateringExpanded ? '-' : '+'}</ThemedText>
           </TouchableOpacity>
           {wateringExpanded && (
             <ThemedView style={styles.dropdownContent}>
-              {wateringHistory.length === 0
-                ? <ThemedText style={styles.dropdownEmpty}>NO WATERING HISTORY</ThemedText>
-                : wateringHistory.map(r => (
-                    <ThemedText key={r.id} style={styles.dropdownItem}>{r.date} — {r.amount}</ThemedText>
+              {activityLogs.length === 0
+                ? <ThemedText style={styles.dropdownEmpty}>NO ACTIVITY LOGS</ThemedText>
+                : activityLogs.map(log => (
+                    <ThemedText key={log.user_id} style={styles.dropdownItem}>
+                      {log.user_id} — {log.activity} — {new Date(log.time).toLocaleString()}
+                    </ThemedText>
                   ))
               }
             </ThemedView>

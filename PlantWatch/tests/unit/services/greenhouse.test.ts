@@ -6,6 +6,9 @@ jest.mock('@/util/supabase', () => ({
   supabase: {
     from: jest.fn(),
     rpc: jest.fn(),
+    auth: {
+      getUser: jest.fn(),
+    },
   },
 }));
 
@@ -16,6 +19,10 @@ describe('Greenhouse Service - Unit Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+      data: { user: { id: mockUserId } },
+      error: null,
+    });
   });
 
   describe('createGreenhouse', () => {
@@ -35,7 +42,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         error: null,
       });
 
-      const result = await createGreenhouse(mockUserId, mockGreenhouseName);
+      const result = await createGreenhouse(mockGreenhouseName);
 
       expect(result.error).toBeUndefined();
       expect(result.data).toBe(mockGreenhouseId);
@@ -66,7 +73,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         }),
       });
 
-      const result = await createGreenhouse(mockUserId, mockGreenhouseName);
+      const result = await createGreenhouse(mockGreenhouseName);
 
       expect(result.error).toBe('You already have a greenhouse with this name');
       expect(result.data).toBeUndefined();
@@ -84,7 +91,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         }),
       });
 
-      const result = await createGreenhouse(mockUserId, mockGreenhouseName);
+      const result = await createGreenhouse(mockGreenhouseName);
 
       expect(result.error).toEqual(mockError);
       expect(result.data).toBeUndefined();
@@ -114,7 +121,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         }),
       });
 
-      const result = await createGreenhouse(mockUserId, mockGreenhouseName);
+      const result = await createGreenhouse(mockGreenhouseName);
 
       expect(result.error).toEqual(mockError);
       expect(result.data).toBeUndefined();
@@ -139,7 +146,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         error: mockError,
       });
 
-      const result = await createGreenhouse(mockUserId, mockGreenhouseName);
+      const result = await createGreenhouse(mockGreenhouseName);
 
       expect(result.error).toEqual(mockError);
       expect(result.data).toBeUndefined();
@@ -161,7 +168,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         error: null,
       });
 
-      const result = await createGreenhouse(mockUserId, mockGreenhouseName);
+      const result = await createGreenhouse(mockGreenhouseName);
 
       expect(result.data).toBe(mockGreenhouseId);
       // Should only have called from() once (for permissions check)
@@ -184,7 +191,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         error: null,
       });
 
-      const result = await createGreenhouse(mockUserId, mockGreenhouseName);
+      const result = await createGreenhouse(mockGreenhouseName);
 
       expect(result.data).toBeUndefined();
       expect(result.error).toBeUndefined();
@@ -209,7 +216,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         }),
       });
 
-      const result = await getUserGreenhouses(mockUserId);
+      const result = await getUserGreenhouses();
 
       expect(result.error).toBeUndefined();
       expect(result.data).toEqual(mockGreenhouses);
@@ -225,7 +232,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         }),
       });
 
-      const result = await getUserGreenhouses(mockUserId);
+      const result = await getUserGreenhouses();
 
       expect(result.error).toBeUndefined();
       expect(result.data).toEqual([]);
@@ -242,7 +249,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         }),
       });
 
-      const result = await getUserGreenhouses(mockUserId);
+      const result = await getUserGreenhouses();
 
       expect(result.error).toBe('There was an error retrieving your greenhouses from our database. Please try again later.');
       expect(result.data).toBeUndefined();
@@ -261,7 +268,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         }),
       });
 
-      const result = await getUserGreenhouses(mockUserId);
+      const result = await getUserGreenhouses();
 
       expect(result.data).toHaveLength(2);
       expect(result.data).toEqual([
@@ -279,7 +286,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         }),
       });
 
-      const result = await getUserGreenhouses(mockUserId);
+      const result = await getUserGreenhouses();
 
       expect(result.data).toEqual([]);
     });
@@ -299,7 +306,7 @@ describe('Greenhouse Service - Unit Tests', () => {
         }),
       });
 
-      const result = await getUserGreenhouses(mockUserId);
+      const result = await getUserGreenhouses();
 
       expect(Array.isArray(result.data)).toBe(true);
       expect(result.data?.every(item => !Array.isArray(item))).toBe(true);

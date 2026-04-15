@@ -39,7 +39,7 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
 
   async function fetchGreenhouses() {
       if (!session || !user) return;
-      const { data, error } = await getUserGreenhouses(user.id);
+      const { data, error } = await getUserGreenhouses();
       if (error) {
           Alert.alert('Error', error);
       } else {

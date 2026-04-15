@@ -46,7 +46,7 @@ export default function PreviewScreen() {
                     result.description = description.data;
 
                 if (session && user) 
-                    await logScan(user.id, formattedUri, result);
+                    await logScan(formattedUri, result);
 
                 // Navigate to results with scan data
                 router.replace({

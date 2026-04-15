@@ -68,14 +68,17 @@ export async function scanPlant(uri: string) {
 }
 
 // Return: imageURL (string)
-export async function saveImageToDatabase(userId: string, uri: string, tableName: string) {
+export async function saveImageToDatabase(uri: string, tableName: string) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) throw new Error('Not authenticated');
+
     const file = new File(uri);
     const fh = file.open();
     const bytes = fh.readBytes(fh.size ?? 0);
 
     if (bytes.length == 0) throw new Error("Failed to read the file with given URI.")
 
-    const fileName = `${userId}/${Date.now()}.jpg`;
+    const fileName = `${user.id}/${Date.now()}.jpg`;
     const { error } = await supabase.storage
         .from(tableName)
         .upload(fileName, bytes, {
@@ -113,19 +116,24 @@ async function getOldestScanId(userId: string) {
     return data.scan_id;
 }
 
-export async function getScans(userId: string) {
+export async function getScans() {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) throw new Error('Not authenticated');
+
     const { data, error } = await supabase
         .from(SCAN_HISTORY_TABLE)
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
     if (error) throw new Error(`Failed to get user scans: ${error.message}`);
-    
+
     return data;
 }
 
-export async function deleteScan(userId: string, scanId: string) {
+export async function deleteScan(scanId: string) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) throw new Error('Not authenticated');
     const { data, error: fetchError } = await supabase
         .from(SCAN_HISTORY_TABLE)
         .select('scan_img_url')
@@ -218,12 +226,14 @@ export async function deleteGreenhousePlant(plantId: string) {
     return { error };
 }
 
-export async function logScan(userId: string, uri: string, scan: PlantScanResult) {
+export async function logScan(uri: string, scan: PlantScanResult) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return;
 
     const { data, error } = await supabase
         .from(SCAN_HISTORY_TABLE)
         .insert({
-            user_id: userId,
+            user_id: user.id,
             common_name: scan.commonName,
             genus: scan.genus,
             family: scan.family,
@@ -238,7 +248,7 @@ export async function logScan(userId: string, uri: string, scan: PlantScanResult
     }
 
     try {
-        const imgURL = await saveImageToDatabase(userId, uri, PLANT_IMG_BUCKET);
+        const imgURL = await saveImageToDatabase(uri, PLANT_IMG_BUCKET);
         const { error } = await supabase
         .from(SCAN_HISTORY_TABLE)
         .update({scan_img_url: imgURL})
@@ -248,12 +258,12 @@ export async function logScan(userId: string, uri: string, scan: PlantScanResult
             console.error('Failed to save scan:', error);
             return;
         }
-        
+
         // Delete oldest scan if past cap
-        const numScans = await getScanCount(userId);
+        const numScans = await getScanCount(user.id);
         if (numScans > SCAN_LIMIT) {
-            const oldest = await getOldestScanId(userId);
-            deleteScan(userId, oldest);
+            const oldest = await getOldestScanId(user.id);
+            deleteScan(oldest);
         }
     } catch {
         console.error('Failed to save scan image:', error);
