@@ -2,20 +2,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { GreenhouseMenu } from '@/components/greenhouse-menu';
+import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 
 export default function ActivityLogScreen() {
-  const insets = useSafeAreaInsets();
+
   const router = useRouter();
-  const { width } = useWindowDimensions();
-  const styles = getStyles(width);
+  const styles = getStyles();
   const { greenhouse_id, greenhouse_name, from } = useLocalSearchParams<{
     greenhouse_id: string;
     greenhouse_name: string;
@@ -26,16 +24,12 @@ export default function ActivityLogScreen() {
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ animation: from === 'menu' ? 'fade' : 'default' }} />
 
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <GreenhouseMenu
-          greenhouse_id={greenhouse_id}
-          greenhouse_name={greenhouse_name}
-          currentPage="activity-log"
-        />
-        <ThemedText style={styles.headerTitle}>{greenhouse_name}</ThemedText>
-        <View style={styles.headerSpacer} />
-      </View>
+      <GreenhouseHeader
+        greenhouse_id={greenhouse_id}
+        greenhouse_name={greenhouse_name}
+        currentPage="activity-log"
+        pageTitle="Activity Log"
+      />
 
       {/* Buttons */}
       <View style={styles.content}>
@@ -53,26 +47,9 @@ export default function ActivityLogScreen() {
   );
 }
 
-const getStyles = (width: number) => StyleSheet.create({
+const getStyles = () => StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: width * 0.041,
-    paddingBottom: 12,
-    backgroundColor: ThemeColors.inputBackground,
-  },
-  headerSpacer: {
-    width: width * 0.113,
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: ThemeColors.header,
   },
   content: {
     flex: 1,

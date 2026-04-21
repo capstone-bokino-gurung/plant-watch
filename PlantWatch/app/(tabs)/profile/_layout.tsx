@@ -9,6 +9,13 @@ export default function ProfileLayout() {
           headerShown: false
         }} 
       />
+    <Stack.Screen 
+        name="invitations" 
+        options={{ 
+          headerShown: false,
+          animation: 'fade'
+        }} 
+      />
     </Stack>
   );
 }

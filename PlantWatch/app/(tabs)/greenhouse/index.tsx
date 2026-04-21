@@ -57,7 +57,7 @@ export default function GreenhouseScreen() {
         if (error) {
             Alert.alert('Error', typeof error === 'string' ? error : error.message);
         } else {
-            setGreenhouses(prev => [...prev, data]);
+            setGreenhouses(prev => [...prev, data[0]]);
             setNewGreenhouseName('');
             setCreateModalOpen(false);
         }
@@ -117,13 +117,20 @@ export default function GreenhouseScreen() {
                 )}
             </ScrollView>
 
-            {/* Floating Add Button */}
-            <TouchableOpacity
-                style={[styles.fab, { bottom: insets.bottom + 24 }]}
-                onPress={() => setCreateModalOpen(true)}
-            >
-                <ThemedText style={styles.fabText}>+</ThemedText>
-            </TouchableOpacity>
+            <View style={[styles.bottomRow, { bottom: insets.bottom }]}>
+                <TouchableOpacity
+                    style={styles.invitesButton}
+                    onPress={() => router.navigate('/profile/invitations')}
+                >
+                    <ThemedText style={styles.invitesButtonText}>View Invites</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.fab}
+                    onPress={() => setCreateModalOpen(true)}
+                >
+                    <ThemedText style={styles.fabText}>+</ThemedText>
+                </TouchableOpacity>
+            </View>
 
             {/* Create Greenhouse Modal */}
             <Modal visible={createModalOpen} transparent animationType="fade">
@@ -176,14 +183,14 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
   },
   header: {
     paddingHorizontal: width * 0.041,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: ThemeColors.inputBackground,
+    paddingBottom: 20,
+    backgroundColor: ThemeColors.inputBackground,
   },
   headerTitle: {
     fontSize: 22,
     fontWeight: 'bold',
     color: ThemeColors.header,
+    textAlign: 'center',
   },
   content: {
     padding: width * 0.041,
@@ -224,13 +231,33 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
   deleteText: {
     fontSize: 20,
   },
-  fab: {
+  bottomRow: {
     position: 'absolute',
+    left: width * 0.062,
     right: width * 0.062,
-    width: width * 0.144,
-    height: width * 0.144,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  invitesButton: {
+    flex: 1,
+    height: width * 0.12,
+    backgroundColor: ThemeColors.button,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+  },
+  invitesButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  fab: {
+    width: width * 0.12,
+    height: width * 0.12,
     borderRadius: width * 0.072,
-    backgroundColor: '#2d6a4f',
+    backgroundColor: ThemeColors.button,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

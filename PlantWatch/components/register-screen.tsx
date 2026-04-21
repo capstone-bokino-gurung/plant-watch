@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import {
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
+  ScrollView,
   StyleSheet,
   TextInput,
   Text,
   Image,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   useWindowDimensions,
 } from 'react-native';
 
@@ -30,56 +33,62 @@ export function RegisterScreen() {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      {/* Logo */}
-      <ThemedView style={styles.logoContainer}>
-        <Image source={require('@/assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
-        <Text style={styles.logoText}>plantwatch</Text>
-      </ThemedView>
-      
-      {/* Center Section */}
-      <ThemedView style={styles.formContainer}>
-          <TextInput
-              style={styles.input}
-              placeholder="Email"
-              placeholderTextColor="#aaa"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-          />
-          <TextInput
-              style={styles.input}
-              placeholder="First Name"
-              placeholderTextColor="#aaa"
-              value={first_name}
-              onChangeText={setFirstName}
-              autoCapitalize="words"
-              keyboardType="default"
-          />
-          <TextInput
-              style={styles.input}
-              placeholder="Last Name"
-              placeholderTextColor="#aaa"
-              value={last_name}
-              onChangeText={setLastName}
-              autoCapitalize="words"
-              keyboardType="default"
-          />
-          <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor="#aaa"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-          />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Logo */}
+          <ThemedView style={styles.logoContainer}>
+            <Image source={require('@/assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
+            <Text style={styles.logoText}>plantwatch</Text>
+          </ThemedView>
 
-          <TouchableOpacity style={styles.registerButton} onPress={() => {signUpWithEmail(email, password, first_name, last_name)}} disabled={loading}>
-            <ThemedText style={styles.registerButtonText}>Register</ThemedText>
-          </TouchableOpacity>
+          {/* Center Section */}
+          <ThemedView style={styles.formContainer}>
+              <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  placeholderTextColor="#aaa"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+              />
+              <TextInput
+                  style={styles.input}
+                  placeholder="First Name"
+                  placeholderTextColor="#aaa"
+                  value={first_name}
+                  onChangeText={setFirstName}
+                  autoCapitalize="words"
+                  keyboardType="default"
+              />
+              <TextInput
+                  style={styles.input}
+                  placeholder="Last Name"
+                  placeholderTextColor="#aaa"
+                  value={last_name}
+                  onChangeText={setLastName}
+                  autoCapitalize="words"
+                  keyboardType="default"
+              />
+              <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#aaa"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+              />
 
-
-      </ThemedView>
+              <TouchableOpacity style={styles.registerButton} onPress={() => {signUpWithEmail(email, password, first_name, last_name)}} disabled={loading}>
+                <ThemedText style={styles.registerButtonText}>Register</ThemedText>
+              </TouchableOpacity>
+          </ThemedView>
+        </ScrollView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
     );
 }
@@ -87,6 +96,9 @@ export function RegisterScreen() {
 const getStyles = (width: number, height: number) => StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   formContainer: {
     flex: 1,

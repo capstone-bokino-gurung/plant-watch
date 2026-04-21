@@ -64,8 +64,7 @@ export function useAuth(): UseAuthReturn {
     const { session, error } = await signUp(email, password, first_name, last_name);
 
     if (error) Alert.alert(error.message);
-    if (!session) Alert.alert('Check your email for verification.')
-    Alert.alert("Success?");
+    else if (!session) Alert.alert('Check your email for verification.');
 
     setLoading(false);
   }

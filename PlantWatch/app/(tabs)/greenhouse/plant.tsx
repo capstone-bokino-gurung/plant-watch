@@ -10,7 +10,7 @@ import { Plant } from '@/interfaces/plant';
 import { router, useLocalSearchParams } from 'expo-router';
 import { BackButton } from '@/components/ui/back-button';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { AddPlant } from '@/components/add-plant';
+import { AddPlant } from '@/components/modals/add-plant';
 
 
 type Greenhouse = { greenhouse_id: string; name: string };

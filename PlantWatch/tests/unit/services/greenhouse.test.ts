@@ -38,14 +38,14 @@ describe('Greenhouse Service - Unit Tests', () => {
 
       // Mock: RPC call succeeds
       (supabase.rpc as jest.Mock).mockResolvedValue({
-        data: [{ greenhouse_id: mockGreenhouseId }],
+        data: [{ greenhouse_id: mockGreenhouseId, name: mockGreenhouseName, created_at: 'testdate' }],
         error: null,
       });
 
       const result = await createGreenhouse(mockGreenhouseName);
 
       expect(result.error).toBeUndefined();
-      expect(result.data).toBe(mockGreenhouseId);
+      expect(result.data).toEqual([{ greenhouse_id: mockGreenhouseId, name: mockGreenhouseName, created_at: 'testdate' }]);
       expect(supabase.rpc).toHaveBeenCalledWith('create_greenhouse_with_permission', {
         p_user_id: mockUserId,
         p_greenhouse_name: mockGreenhouseName,
@@ -164,13 +164,13 @@ describe('Greenhouse Service - Unit Tests', () => {
 
       // Mock: RPC succeeds
       (supabase.rpc as jest.Mock).mockResolvedValue({
-        data: [{ greenhouse_id: mockGreenhouseId }],
+        data: [{ greenhouse_id: mockGreenhouseId, name: mockGreenhouseName, created_at: 'testdate' }],
         error: null,
       });
 
       const result = await createGreenhouse(mockGreenhouseName);
 
-      expect(result.data).toBe(mockGreenhouseId);
+      expect(result.data).toEqual([{ greenhouse_id: mockGreenhouseId, name: mockGreenhouseName, created_at: 'testdate' }]);
       // Should only have called from() once (for permissions check)
       expect(supabase.from).toHaveBeenCalledTimes(1);
     });

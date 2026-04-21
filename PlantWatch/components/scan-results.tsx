@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { getUserGreenhouses } from '@/services/greenhouse';
 import { useAuth } from '@/hooks/useAuth';
-import { AddPlant } from '@/components/add-plant';
+import { AddPlant } from '@/components/modals/add-plant';
 import { Plant } from '@/interfaces/plant';
 
 interface ScanResultsProps {
@@ -83,7 +83,9 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
 
       <ThemedView style={styles.descriptionContainer}>
         <ThemedText style={styles.descriptionLabel}>AI Confidence Score:</ThemedText>
-        <ThemedText style={styles.descriptionText}>{confidenceScore}</ThemedText>
+        <ThemedView style={styles.progressTrack}>
+          <ThemedView style={[styles.progressFill, { width: `${parseFloat(confidenceScore) * 100}%` }]} />
+        </ThemedView>
         <ThemedText style={styles.descriptionLabel}>Scientific Name:</ThemedText>
         <ThemedText style={styles.descriptionText}>{scientificName}</ThemedText>
         <ThemedText style={styles.descriptionLabel}>Additional information:</ThemedText>
@@ -159,7 +161,9 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
   descriptionContainer: { borderRadius: 12, padding: width * 0.046, minHeight: height * 0.178 },
   descriptionLabel: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
   descriptionText: { fontSize: 16, lineHeight: 24, marginBottom: 5 },
-  addButton: { backgroundColor: '#2d6a4f', padding: height * 0.019, borderRadius: 12, alignItems: 'center', marginTop: height * 0.019, marginBottom: height * 0.047 },
+  progressTrack: { width: width * 0.8, height: height * 0.019, borderRadius: height * 0.01, backgroundColor: '#a8d5b5', borderWidth: 1, borderColor: '#000', overflow: 'hidden', marginBottom: 5 },
+  progressFill: { height: '100%', borderRadius: height * 0.01, backgroundColor: ThemeColors.button },
+  addButton: { backgroundColor: ThemeColors.button, padding: height * 0.019, borderRadius: 12, alignItems: 'center', marginTop: height * 0.019, marginBottom: height * 0.047 },
   addButtonDone: { backgroundColor: '#888' },
   addButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },

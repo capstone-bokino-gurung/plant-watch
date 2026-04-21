@@ -11,10 +11,10 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { AddDevice } from '@/components/add-device';
-import { GreenhouseMenu } from '@/components/greenhouse-menu';
+import { AddDevice } from '@/components/modals/add-device';
+import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { ThemeColors } from '@/hooks/get-theme-colors';
-import { getGreenhouseDevices, deleteDevice } from '@/services/device';
+import { getDevices, deleteDevice } from '@/services/device';
 import { Device } from '@/interfaces/device';
 
 export default function DevicesScreen() {
@@ -37,7 +37,7 @@ export default function DevicesScreen() {
 
   async function fetchDevices() {
     setLoading(true);
-    const { data, error } = await getGreenhouseDevices(greenhouse_id);
+    const { data, error } = await getDevices(greenhouse_id);
     if (error) {
       Alert.alert('Error', error.message);
     } else {
@@ -73,16 +73,12 @@ export default function DevicesScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <GreenhouseMenu
-          greenhouse_id={greenhouse_id}
-          greenhouse_name={greenhouse_name}
-          currentPage="devices"
-        />
-        <ThemedText style={styles.headerTitle}>{greenhouse_name}</ThemedText>
-        <View style={styles.headerSpacer} />
-      </View>
+      <GreenhouseHeader
+        greenhouse_id={greenhouse_id}
+        greenhouse_name={greenhouse_name}
+        currentPage="devices"
+        pageTitle="Devices"
+      />
 
       <ScrollView contentContainerStyle={styles.content}>
         <ThemedText style={styles.sectionLabel}>DEVICES ({devices.length})</ThemedText>
@@ -130,23 +126,6 @@ export default function DevicesScreen() {
 const getStyles = (width: number, height: number) => StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: width * 0.041,
-    paddingBottom: 12,
-    backgroundColor: ThemeColors.inputBackground,
-  },
-  headerSpacer: {
-    width: width * 0.113,
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2d6a4f',
   },
   content: {
     padding: width * 0.041,

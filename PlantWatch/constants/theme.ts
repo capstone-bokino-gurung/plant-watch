@@ -21,7 +21,9 @@ export const Colors = {
     button: '#24571b',
     link: '#079231',
     header: '#2d6a4f',
-    sectionHeader: '#999'
+    subHeader: '#46a178',
+    sectionHeader: '#999',
+    denyRed: '#ca2929'
   },
   dark: {
     text: '#ECEDEE',
@@ -35,7 +37,9 @@ export const Colors = {
     button: '#24571b',
     link: '#079231',
     header: '#ffffff',
-    sectionHeader: '#ffffff'
+    subHeader: '#ffffff',
+    sectionHeader: '#ffffff',
+    denyRed: '#ca2929'
   },
 };
 

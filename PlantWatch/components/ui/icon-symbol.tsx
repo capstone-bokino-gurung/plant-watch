@@ -24,6 +24,8 @@ const MAPPING = {
   'pencil': 'edit',
   'line.3.horizontal': 'menu',
   'arrow.right.arrow.left': 'swap-horiz',
+  'arrowtriangle.up.fill': 'arrow-drop-up',
+  'arrowtriangle.down.fill': 'arrow-drop-down',
 } as IconMapping;
 
 /**

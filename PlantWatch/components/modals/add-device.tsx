@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { createDevice } from '@/services/device';
 import { Device } from '@/interfaces/device';
@@ -118,7 +119,7 @@ export function AddDevice({ visible, greenhouseId, onClose, onAdd }: AddDevicePr
                 ) : (
                   <ThemedText style={styles.dropdownPlaceholder}>Select a device type</ThemedText>
                 )}
-                <ThemedText style={styles.dropdownChevron}>{dropdownOpen ? '▲' : '▾'}</ThemedText>
+                <IconSymbol name={dropdownOpen ? 'arrowtriangle.up.fill' : 'arrowtriangle.down.fill'} size={13} color="#888" />
               </TouchableOpacity>
 
               {dropdownOpen && (
@@ -197,6 +198,8 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
+    color: ThemeColors.header,
     marginBottom: height * 0.019,
   },
   fieldLabel: {
@@ -239,10 +242,6 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     fontSize: 16,
     color: '#aaa',
   },
-  dropdownChevron: {
-    fontSize: 16,
-    color: '#888',
-  },
   dropdownList: {
     borderWidth: 1,
     borderColor: '#ddd',
@@ -271,8 +270,8 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: height * 0.0166,
-    marginTop: height * 0.002,
+    marginBottom: height * 0.022,
+    marginTop: height * 0.022,
   },
   checkbox: {
     width: 22,

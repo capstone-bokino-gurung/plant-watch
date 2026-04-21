@@ -11,9 +11,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
-import { AddPlant } from '@/components/add-plant';
+import { AddPlant } from '@/components/modals/add-plant';
 import { ThemedView } from '@/components/themed-view';
-import { GreenhouseMenu } from '@/components/greenhouse-menu';
+import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { getGreenhousePlants, deleteGreenhousePlant } from '@/services/plant';
 import { Plant } from '@/interfaces/plant';
@@ -90,16 +90,12 @@ export default function GreenhouseDashboardScreen() {
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ animation: from === 'menu' ? 'fade' : 'default' }} />
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <GreenhouseMenu
-          greenhouse_id={greenhouse_id}
-          greenhouse_name={greenhouse_name}
-          currentPage="dashboard"
-        />
-        <ThemedText style={styles.headerTitle}>{greenhouse_name}</ThemedText>
-        <View style={styles.headerSpacer} />
-      </View>
+      <GreenhouseHeader
+        greenhouse_id={greenhouse_id}
+        greenhouse_name={greenhouse_name}
+        currentPage="dashboard"
+        pageTitle="Dashboard"
+      />
 
       <ScrollView contentContainerStyle={styles.content}>
         <ThemedText style={styles.lastUpdated}>Last updated: {LAST_UPDATED}</ThemedText>
@@ -151,23 +147,6 @@ export default function GreenhouseDashboardScreen() {
 const getStyles = (width: number, height: number) => StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: width * 0.041,
-    paddingBottom: 12,
-    backgroundColor: ThemeColors.inputBackground,
-  },
-  headerSpacer: {
-    width: width * 0.113,
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2d6a4f',
   },
   content: {
     padding: width * 0.041,

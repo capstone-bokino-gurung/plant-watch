@@ -157,19 +157,20 @@ export function AddPlant({
         <View style={styles.modal}>
           <ThemedText style={styles.modalTitle}>{isEditMode ? 'Edit Plant' : 'Add Plant'}</ThemedText>
 
-          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-            <View style={styles.imageRow}>
-              <Image
-                source={displayImage ? (typeof displayImage === 'string' ? { uri: displayImage } : displayImage) : fallbackImage}
-                style={styles.image}
-                resizeMode="cover"
-              />
-              <TouchableOpacity style={styles.uploadButton} onPress={handlePickImage}>
-                <IconSymbol name="square.and.arrow.up" size={24} color={ThemeColors.button} />
-                <ThemedText style={styles.uploadText}>Upload</ThemedText>
-              </TouchableOpacity>
-            </View>
+          {/* Sticky image row */}
+          <View style={styles.imageRow}>
+            <Image
+              source={displayImage ? (typeof displayImage === 'string' ? { uri: displayImage } : displayImage) : fallbackImage}
+              style={styles.image}
+              resizeMode="cover"
+            />
+            <TouchableOpacity style={styles.uploadButton} onPress={handlePickImage}>
+              <IconSymbol name="square.and.arrow.up" size={24} color={ThemeColors.button} />
+              <ThemedText style={styles.uploadText}>Upload</ThemedText>
+            </TouchableOpacity>
+          </View>
 
+          <ScrollView showsVerticalScrollIndicator={true} keyboardShouldPersistTaps="handled">
             <ThemedText style={styles.fieldLabel}>Label</ThemedText>
             <TextInput
               style={styles.input}
@@ -207,13 +208,17 @@ export function AddPlant({
               onChangeText={setNotes}
               multiline
             />
+          </ScrollView>
+
+          {/* Sticky buttons */}
+          <View style={styles.stickyFooter}>
             <TouchableOpacity style={styles.addButton} onPress={handleSubmit}>
               <ThemedText style={styles.addButtonText}>{isEditMode ? 'Save Changes' : 'Add Plant'}</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity onPress={onClose}>
               <ThemedText style={styles.cancelText}>Cancel</ThemedText>
             </TouchableOpacity>
-          </ScrollView>
+          </View>
         </View>
       </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -223,8 +228,8 @@ export function AddPlant({
 
 const getStyles = (width: number, height: number) => StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modal: { backgroundColor: '#fff', borderRadius: 12, padding: width * 0.062, width: '85%' },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: height * 0.019 },
+  modal: { backgroundColor: '#fff', borderRadius: 12, padding: width * 0.062, width: '85%', maxHeight: height * 0.75 },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', color: ThemeColors.header, marginBottom: height * 0.019 },
   imageRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: height * 0.019 },
   image: { width: width * 0.308, height: width * 0.41, borderRadius: 8, backgroundColor: '#eee' },
   uploadButton: { marginLeft: width * 0.051, alignItems: 'center', gap: 4 },
@@ -234,5 +239,6 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
   notesInput: { height: height * 0.095, textAlignVertical: 'top' },
   addButton: { backgroundColor: ThemeColors.button, padding: height * 0.0166, borderRadius: 8, alignItems: 'center', marginTop: height * 0.005 },
   addButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  stickyFooter: { marginTop: height * 0.012 },
   cancelText: { textAlign: 'center', marginTop: height * 0.014, color: '#999', fontSize: 14 },
 });

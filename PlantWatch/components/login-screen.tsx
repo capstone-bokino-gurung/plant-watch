@@ -3,6 +3,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   TextInput,
   Text,
@@ -32,50 +33,54 @@ export function LoginScreen({ createAccountOnPress }: LoginScreenProps) {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      {/* Logo */}
-      <ThemedView style={styles.logoContainer}>
-        <Image source={require('@/assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
-        <Text style={styles.logoText}>plantwatch</Text>
-      </ThemedView>
-      
-      {/* Center Section */}
-      <ThemedView style={styles.formContainer}>
-          <TextInput
-              style={styles.input}
-              placeholder="Email"
-              placeholderTextColor="#aaa"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-          />
-          <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor="#aaa"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-          />
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Logo */}
+        <ThemedView style={styles.logoContainer}>
+          <Image source={require('@/assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
+          <Text style={styles.logoText}>plantwatch</Text>
+        </ThemedView>
 
-          <TouchableOpacity style={styles.loginButton} onPress={() => {signInWithEmail(email, password)}} disabled={loading}>
-            <ThemedText style={styles.loginButtonText}>Log In</ThemedText>
-          </TouchableOpacity>
+        {/* Center Section */}
+        <ThemedView style={styles.formContainer}>
+            <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor="#aaa"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor="#aaa"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+            />
 
-          <TouchableOpacity onPress={() => {/* navigate to forgot password */}}>
-            <ThemedText style={styles.forgotPassword}>Forgot password?</ThemedText>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.loginButton} onPress={() => {signInWithEmail(email, password)}} disabled={loading}>
+              <ThemedText style={styles.loginButtonText}>Log In</ThemedText>
+            </TouchableOpacity>
 
+            <TouchableOpacity onPress={() => {/* navigate to forgot password */}}>
+              <ThemedText style={styles.forgotPassword}>Forgot password?</ThemedText>
+            </TouchableOpacity>
+        </ThemedView>
 
-      </ThemedView>
-
-      {/* Footer */}
+        {/* Footer */}
         <ThemedView style={styles.footer}>
-        <ThemedText style={styles.footerText}>Need an account? </ThemedText>
-        <TouchableOpacity onPress={createAccountOnPress}>
-            <ThemedText style={styles.footerLink}>Create account.</ThemedText>
-        </TouchableOpacity>
-      </ThemedView>
+          <ThemedText style={styles.footerText}>Need an account? </ThemedText>
+          <TouchableOpacity onPress={createAccountOnPress}>
+              <ThemedText style={styles.footerLink}>Create account.</ThemedText>
+          </TouchableOpacity>
+        </ThemedView>
+      </ScrollView>
     </KeyboardAvoidingView>
     );
 }
@@ -83,6 +88,9 @@ export function LoginScreen({ createAccountOnPress }: LoginScreenProps) {
 const getStyles = (width: number, height: number) => StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   logoContainer: {
     alignItems: 'center',

@@ -1,6 +1,7 @@
 import { LoadingSpinner } from "@/components/loading-spin";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from '@/components/themed-view';
+import { BackButton } from '@/components/ui/back-button';
 import { ThemeColors } from "@/hooks/get-theme-colors";
 import { useAuth } from "@/hooks/useAuth";
 import { PlantScanResult } from '@/interfaces/plant';
@@ -8,7 +9,8 @@ import { getScans } from "@/services/plant";
 import { formatTime } from "@/util/supabase";
 import { router } from 'expo-router';
 import { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, TouchableOpacity, useColorScheme, useWindowDimensions } from "react-native";
+import { Image, ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ScanCardProps {
   imageUri: string;
@@ -23,10 +25,7 @@ const ScanCard = ({ imageUri, commonName, time, onPress }: ScanCardProps) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <ThemedView style={styles.card}>
-        <Image
-          source={{ uri: imageUri }}
-          style={styles.cardImage}
-        />
+        <Image source={{ uri: imageUri }} style={styles.cardImage} />
         <ThemedView style={styles.cardContent}>
           <ThemedText style={styles.labelText}>COMMON NAME</ThemedText>
           <ThemedText style={styles.valueText}>{commonName}</ThemedText>
@@ -39,104 +38,104 @@ const ScanCard = ({ imageUri, commonName, time, onPress }: ScanCardProps) => {
 };
 
 export default function HistoryScreen() {
-    const theme = useColorScheme() ?? 'light';
-    const { session, user } = useAuth();
-    const [scanHistory, setScanHistory] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const { width, height } = useWindowDimensions();
-    const styles = getStyles(width, height);
+  const { session, user } = useAuth();
+  const [scanHistory, setScanHistory] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
+  const insets = useSafeAreaInsets();
 
-    useEffect(() => {
-        async function loadScans() {
-            if (!session || !user) {
-                setIsLoading(false);
-                return;
-            }
+  useEffect(() => {
+    async function loadScans() {
+      if (!session || !user) {
+        setIsLoading(false);
+        return;
+      }
+      try {
+        const scans = await getScans();
+        setScanHistory(scans);
+      } catch (error) {
+        console.error('Failed to load scans:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadScans();
+  }, [session, user]);
 
-            try {
-                const scans = await getScans();
-                setScanHistory(scans);
-            } catch (error) {
-                console.error('Failed to load scans:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
-        loadScans();
-    }, [session, user]);
-
-    const handleScanPress = (scan: any) => {
-        const scanData: PlantScanResult = {
-            imageUri: scan.scan_img_uri,
-            commonName: scan.common_name,
-            scientificName: scan.scientific_name,
-            genus: scan.genus,
-            family: scan.family,
-            confidenceScore: String(scan.confidence_score),
-            description: 'No description available.'
-        };
-
-        router.push({
-            pathname: '/scan/results',
-            params: {
-                imageUri: scan.scan_img_url,
-                scanData: JSON.stringify(scanData),
-                from: 'history'
-            },
-        });
+  const handleScanPress = (scan: any) => {
+    const scanData: PlantScanResult = {
+      imageUri: scan.scan_img_uri,
+      commonName: scan.common_name,
+      scientificName: scan.scientific_name,
+      genus: scan.genus,
+      family: scan.family,
+      confidenceScore: String(scan.confidence_score),
+      description: 'No description available.',
     };
+    router.push({
+      pathname: '/scan/results',
+      params: { imageUri: scan.scan_img_url, scanData: JSON.stringify(scanData), from: 'history' },
+    });
+  };
 
-    if (!session || !user) {
-        return <ThemedView />;
-    }
+  if (!session || !user) return <ThemedView />;
 
-    if (isLoading) {
-        return (
-            <ThemedView style={styles.centeredContainer}>
-                <ThemedText style={{paddingBottom: 5, fontWeight: 600}}>Loading...</ThemedText>
-                <LoadingSpinner />
-            </ThemedView>
-        );
-    }
-
+  if (isLoading) {
     return (
-        <ThemedView style={{flex: 1, alignItems: "center"}}>
-            <ThemedView style={styles.scrollContainer}>
-                <ScrollView contentContainerStyle={{paddingLeft: '5%'}}>
-                    {scanHistory.map(scan => (
-                        <ScanCard
-                            key={scan.scan_id}
-                            imageUri={scan.scan_img_url}
-                            commonName={scan.common_name}
-                            time={formatTime(scan.created_at)}
-                            onPress={() => handleScanPress(scan)}
-                        />
-                    ))}
-                </ScrollView>
-            </ThemedView>
-        </ThemedView>
+      <ThemedView style={styles.centeredContainer}>
+        <ThemedText style={{ paddingBottom: 5, fontWeight: '600' }}>Loading...</ThemedText>
+        <LoadingSpinner />
+      </ThemedView>
     );
+  }
+
+  return (
+    <ThemedView style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+        <BackButton onPress={() => router.back()} floating={false} />
+        <ThemedText style={styles.headerTitle}>Scan History</ThemedText>
+        <View style={styles.headerSpacer} />
+      </View>
+
+      <ThemedView style={styles.listWrapper}>
+        <ThemedView style={styles.scrollContainer}>
+          <ScrollView contentContainerStyle={{ paddingLeft: '5%' }}>
+            {scanHistory.map(scan => (
+              <ScanCard
+                key={scan.scan_id}
+                imageUri={scan.scan_img_url}
+                commonName={scan.common_name}
+                time={formatTime(scan.created_at)}
+                onPress={() => handleScanPress(scan)}
+              />
+            ))}
+          </ScrollView>
+        </ThemedView>
+      </ThemedView>
+    </ThemedView>
+  );
 }
 
 const getStyles = (width: number, height: number) => StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  centeredContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  container: { flex: 1 },
+  centeredContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    paddingTop: height * 0.073,
-    paddingBottom: 16,
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: width * 0.041,
+    paddingBottom: 20,
+    backgroundColor: ThemeColors.inputBackground,
   },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: ThemeColors.header,
+  },
+  headerSpacer: { width: 44 },
+  listWrapper: { flex: 1, alignItems: 'center' },
   scrollContainer: {
     top: '2.5%',
     paddingTop: height * 0.024,
@@ -154,23 +153,13 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     marginBottom: 12,
     overflow: 'hidden',
   },
-  cardImage: {
-    width: '30%',
-    height: '100%',
-  },
+  cardImage: { width: '30%', height: '100%' },
   cardContent: {
     flex: 1,
     padding: 8,
     paddingLeft: width * 0.046,
     justifyContent: 'space-around',
   },
-  labelText: {
-    fontSize: 12,
-    color: '#888',
-    fontWeight: '600',
-  },
-  valueText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
+  labelText: { fontSize: 12, color: '#888', fontWeight: '600' },
+  valueText: { fontSize: 14, fontWeight: '500' },
 });

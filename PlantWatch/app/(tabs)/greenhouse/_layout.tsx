@@ -50,6 +50,34 @@ export default function GreenhouseLayout() {
             animation: 'fade',
         }}
       />
+      <Stack.Screen
+        name="settings"
+        options={{
+            headerShown: false,
+            animation: 'fade',
+        }}
+      />
+      <Stack.Screen
+        name="user-roles"
+        options={{
+            headerShown: false,
+            animation: 'fade',
+        }}
+      />
+      <Stack.Screen
+        name="users"
+        options={{
+            headerShown: false,
+            animation: 'fade',
+        }}
+      />
+      {/* <Stack.Screen
+        name="activity-log"
+        options={{
+            headerShown: false,
+            animation: 'fade',
+        }}
+      /> */}
     </Stack>
   );
 }

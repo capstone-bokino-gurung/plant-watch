@@ -15,6 +15,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { GreenhouseMenu } from '@/components/greenhouse-menu';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 
 const ACTIVITY_TYPES = ['Watering', 'Soil Change'];
@@ -87,7 +88,7 @@ export default function LogActivityScreen() {
             <ThemedText style={selectedActivity ? styles.dropdownSelected : styles.dropdownPlaceholder}>
               {selectedActivity ?? 'Select an activity type'}
             </ThemedText>
-            <ThemedText style={styles.dropdownChevron}>{dropdownOpen ? '▲' : '▾'}</ThemedText>
+            <IconSymbol name={dropdownOpen ? 'arrowtriangle.up.fill' : 'arrowtriangle.down.fill'} size={13} color="#888" />
           </TouchableOpacity>
           {activityError && (
             <ThemedText style={styles.errorText}>This field is required</ThemedText>
@@ -248,10 +249,6 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
   dropdownPlaceholder: {
     fontSize: 16,
     color: '#aaa',
-  },
-  dropdownChevron: {
-    fontSize: 16,
-    color: '#888',
   },
   dropdownList: {
     borderWidth: 1,

@@ -23,13 +23,11 @@ export default function ScanLayout() {
           animation: 'slide_from_right'
         }} 
       />
-      <Stack.Screen 
-        name="history" 
-        options={{ 
-          headerShown: true,
-          headerTitle: 'Scan History',
-          headerBackTitle: 'Camera'
-        }} 
+      <Stack.Screen
+        name="history"
+        options={{
+          headerShown: false,
+        }}
       />
     </Stack>
   );

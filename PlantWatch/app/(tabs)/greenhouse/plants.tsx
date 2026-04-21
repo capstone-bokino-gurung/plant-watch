@@ -11,8 +11,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { AddPlant } from '@/components/add-plant';
-import { GreenhouseMenu } from '@/components/greenhouse-menu';
+import { AddPlant } from '@/components/modals/add-plant';
+import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { getGreenhousePlants, deleteGreenhousePlant } from '@/services/plant';
 import { Plant } from '@/interfaces/plant';
@@ -73,16 +73,12 @@ export default function PlantsScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <GreenhouseMenu
-          greenhouse_id={greenhouse_id}
-          greenhouse_name={greenhouse_name}
-          currentPage="plants"
-        />
-        <ThemedText style={styles.headerTitle}>{greenhouse_name}</ThemedText>
-        <View style={styles.headerSpacer} />
-      </View>
+      <GreenhouseHeader
+        greenhouse_id={greenhouse_id}
+        greenhouse_name={greenhouse_name}
+        currentPage="plants"
+        pageTitle="Plants"
+      />
 
       <ScrollView contentContainerStyle={styles.content}>
         <ThemedText style={styles.sectionLabel}>PLANTS ({plants.length})</ThemedText>
@@ -125,23 +121,6 @@ export default function PlantsScreen() {
 const getStyles = (width: number, height: number) => StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: width * 0.041,
-    paddingBottom: 12,
-    backgroundColor: ThemeColors.inputBackground,
-  },
-  headerSpacer: {
-    width: width * 0.113,
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2d6a4f',
   },
   content: {
     padding: width * 0.041,

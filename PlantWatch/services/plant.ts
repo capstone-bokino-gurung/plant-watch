@@ -22,7 +22,6 @@ export async function getDescription(commonName: string) {
 
         if (response.ok) {
             const responseJSON = await response.json();
-            console.log(responseJSON)
             return {data: responseJSON.message};
         }
 
