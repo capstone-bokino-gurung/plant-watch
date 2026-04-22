@@ -83,7 +83,7 @@ export default function GreenhouseDashboardScreen() {
   const handlePlantPress = (plant: Plant) => {
     router.push({
       pathname: '/greenhouse/plant',
-      params: { plantData: JSON.stringify(plant) },
+      params: { plantData: JSON.stringify(plant), greenhouse_name },
     });
   };
 

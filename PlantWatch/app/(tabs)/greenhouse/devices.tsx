@@ -65,8 +65,10 @@ export default function DevicesScreen() {
   const handleDevicePress = (device: Device) => {
     router.push({
       pathname: '/greenhouse/device',
-      params: {
-        deviceData: JSON.stringify(device),
+      params: { 
+        greenhouse_id: greenhouse_id,
+        greenhouse_name: greenhouse_name,
+        device_id: device.device_id 
       },
     });
   };

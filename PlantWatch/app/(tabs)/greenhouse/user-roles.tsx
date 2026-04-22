@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Dropdown } from '@/components/ui/dropdown';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { getRoleGroups, createRoleGroup, updateRoleGroup } from '@/services/role_groups';
 import { RoleGroup } from '@/interfaces/role_group';
@@ -99,36 +100,17 @@ export default function UserRolesScreen() {
 
         {/* Role dropdown */}
         <ThemedText style={styles.fieldLabel}>Role</ThemedText>
-        <TouchableOpacity
-          style={styles.dropdownTrigger}
-          onPress={() => setDropdownOpen(curr => !curr)}
-          activeOpacity={0.8}
-        >
-          <ThemedText style={selectedRole ? styles.dropdownSelected : styles.dropdownPlaceholder}>
-            {selectedRole ? selectedRole.name : 'Select a role group'}
-          </ThemedText>
-          <IconSymbol name={dropdownOpen ? 'arrowtriangle.up.fill' : 'arrowtriangle.down.fill'} size={13} color="#888" />
-        </TouchableOpacity>
-
-        {dropdownOpen && (
-          <View style={styles.dropdownList}>
-            {roleGroups.length === 0 ? (
-              <View style={styles.dropdownItem}>
-                <ThemedText style={styles.dropdownItemText}>No role groups found</ThemedText>
-              </View>
-            ) : (
-              roleGroups.map(role => (
-                <TouchableOpacity
-                  key={role.role_id}
-                  style={[styles.dropdownItem, selectedRole?.role_id === role.role_id && styles.dropdownItemActive]}
-                  onPress={() => selectRole(role)}
-                >
-                  <ThemedText style={styles.dropdownItemText}>{role.name}</ThemedText>
-                </TouchableOpacity>
-              ))
-            )}
-          </View>
-        )}
+        <Dropdown
+          items={roleGroups}
+          selectedValue={selectedRole}
+          onSelect={role => { selectRole(role); setDropdownOpen(false); }}
+          getLabel={role => role.name}
+          getKey={role => role.role_id}
+          isOpen={dropdownOpen}
+          onToggle={() => setDropdownOpen(curr => !curr)}
+          placeholder="Select a role group"
+          emptyText="No role groups found"
+        />
 
         {/* Permissions */}
         <ThemedText style={[styles.fieldLabel, { marginTop: height * 0.022 }]}>Permissions</ThemedText>
@@ -201,34 +183,6 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  dropdownTrigger: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: height * 0.014,
-    marginBottom: height * 0.005,
-    minHeight: height * 0.057,
-  },
-  dropdownSelected: { fontSize: 16, color: '#333' },
-  dropdownPlaceholder: { fontSize: 16, color: '#aaa' },
-  dropdownList: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    marginBottom: height * 0.022,
-    overflow: 'hidden',
-  },
-  dropdownItem: {
-    paddingVertical: height * 0.014,
-    paddingHorizontal: width * 0.041,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  dropdownItemActive: { backgroundColor: '#f0f7f4' },
-  dropdownItemText: { fontSize: 15, color: '#333' },
   permissionRow: {
     flexDirection: 'row',
     alignItems: 'center',

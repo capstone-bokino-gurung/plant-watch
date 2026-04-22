@@ -1,3 +1,4 @@
+import { ThemeColors } from '@/hooks/get-theme-colors';
 import React from 'react';
 import {
     StyleSheet,
@@ -23,7 +24,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#1c4415',
+        backgroundColor: ThemeColors.button,
         justifyContent: 'center',
         alignItems: 'center',
     },

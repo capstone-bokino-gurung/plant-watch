@@ -34,10 +34,37 @@ export async function createDevice(
   return { data, error };
 }
 
+export async function getDevice(device_id: string) {
+  const { data, error } = await supabase
+    .from(DEVICES_TABLE)
+    .select('*')
+    .eq('device_id', device_id)
+    .single();
+  return { data: data as Device | null, error };
+}
+
 export async function deleteDevice(device_id: string) {
   const { error } = await supabase
     .from(DEVICES_TABLE)
     .delete()
     .eq('device_id', device_id);
   return { error };
+}
+
+export function formatDeviceReading(device: Device) {
+  const readings: Record<string, string> = {}
+  for (const [type, reading] of Object.entries(device.data)) {
+    if (reading.unit == 'percent') {
+      readings[type] = (reading.value) * 100 + '%';
+    } else {
+      readings[type] = reading.value + ' ' + reading.unit;
+    }
+  }
+  return readings;
+}
+
+export function formatDeviceReadingType(type: string) {
+  const words = type.split('_');
+  const capitalized = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+  return capitalized.join(' ');
 }

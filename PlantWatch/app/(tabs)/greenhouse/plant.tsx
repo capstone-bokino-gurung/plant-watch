@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { ScrollView, TouchableOpacity, StyleSheet, Alert, useWindowDimensions } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { getUserGreenhouses } from '@/services/greenhouse';
 import { getPlantLogs } from '@/services/activity_log';
 import { useAuth } from '@/hooks/useAuth';
 import { Plant } from '@/interfaces/plant';
 import { router, useLocalSearchParams } from 'expo-router';
-import { BackButton } from '@/components/ui/back-button';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+
 import { AddPlant } from '@/components/modals/add-plant';
 
 
@@ -19,7 +19,7 @@ type ActivityLog = { id: string; user_id: string; activity: string; time: string
 type LinkedDevice = { id: string; name: string; type: string };
 
 export default function PlantScreen() {
-  const { plantData } = useLocalSearchParams<{ plantData: string }>();
+  const { plantData, greenhouse_name } = useLocalSearchParams<{ plantData: string; greenhouse_name: string }>();
   const initialPlant: Plant | null = plantData ? JSON.parse(plantData) : null;
 
   const [currentPlant, setCurrentPlant] = useState<Plant | null>(initialPlant);
@@ -71,10 +71,14 @@ export default function PlantScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <BackButton onPress={() => router.back()} />
-      <TouchableOpacity style={styles.editButton} onPress={() => setEditModalOpen(true)}>
-        <IconSymbol name="pencil" size={22} color="#ffffff" />
-      </TouchableOpacity>
+      <GreenhouseHeader
+        greenhouse_id={greenhouse_id ?? ''}
+        greenhouse_name={greenhouse_name ?? ''}
+        currentPage="plants"
+        pageTitle={`Plants / ${label}`}
+        leftButton="back"
+        onEdit={() => setEditModalOpen(true)}
+      />
 
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <ThemedView style={styles.topSection}>
@@ -154,7 +158,6 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
   },
   contentContainer: {
     padding: width * 0.051,
-    paddingTop: height * 0.142,
   },
   topSection: {
     flexDirection: 'row',

@@ -15,7 +15,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { GreenhouseMenu } from '@/components/greenhouse-menu';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Dropdown } from '@/components/ui/dropdown';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 
 const ACTIVITY_TYPES = ['Watering', 'Soil Change'];
@@ -80,31 +80,19 @@ export default function LogActivityScreen() {
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
           <ThemedText style={styles.fieldLabel}>Activity</ThemedText>
-          <TouchableOpacity
-            style={[styles.dropdownTrigger, activityError && styles.dropdownTriggerError]}
-            onPress={() => setDropdownOpen(curr => !curr)}
-            activeOpacity={0.8}
-          >
-            <ThemedText style={selectedActivity ? styles.dropdownSelected : styles.dropdownPlaceholder}>
-              {selectedActivity ?? 'Select an activity type'}
-            </ThemedText>
-            <IconSymbol name={dropdownOpen ? 'arrowtriangle.up.fill' : 'arrowtriangle.down.fill'} size={13} color="#888" />
-          </TouchableOpacity>
+          <Dropdown
+            items={ACTIVITY_TYPES}
+            selectedValue={selectedActivity}
+            onSelect={type => { setSelectedActivity(type); setActivityError(false); setDropdownOpen(false); }}
+            getLabel={type => type}
+            getKey={type => type}
+            isOpen={dropdownOpen}
+            onToggle={() => setDropdownOpen(curr => !curr)}
+            placeholder="Select an activity type"
+            error={activityError}
+          />
           {activityError && (
             <ThemedText style={styles.errorText}>This field is required</ThemedText>
-          )}
-          {dropdownOpen && (
-            <View style={styles.dropdownList}>
-              {ACTIVITY_TYPES.map(type => (
-                <TouchableOpacity
-                  key={type}
-                  style={[styles.dropdownItem, selectedActivity === type && styles.dropdownItemActive]}
-                  onPress={() => { setSelectedActivity(type); setActivityError(false); setDropdownOpen(false); }}
-                >
-                  <ThemedText style={styles.dropdownItemText}>{type}</ThemedText>
-                </TouchableOpacity>
-              ))}
-            </View>
           )}
 
           <ThemedText style={styles.fieldLabel}>Date</ThemedText>
@@ -222,53 +210,11 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     height: height * 0.18,
     marginBottom: height * 0.03,
   },
-  dropdownTrigger: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: height * 0.014,
-    marginBottom: height * 0.005,
-    minHeight: height * 0.057,
-  },
-  dropdownTriggerError: {
-    borderColor: '#d9534f',
-  },
   errorText: {
     color: '#d9534f',
     fontSize: 12,
     marginBottom: height * 0.014,
     marginTop: 2,
-  },
-  dropdownSelected: {
-    fontSize: 16,
-    color: '#333',
-  },
-  dropdownPlaceholder: {
-    fontSize: 16,
-    color: '#aaa',
-  },
-  dropdownList: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    marginBottom: height * 0.022,
-    overflow: 'hidden',
-  },
-  dropdownItem: {
-    paddingVertical: height * 0.014,
-    paddingHorizontal: width * 0.041,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  dropdownItemActive: {
-    backgroundColor: '#f0f7f4',
-  },
-  dropdownItemText: {
-    fontSize: 15,
-    color: '#333',
   },
   selectPlantsButton: {
     backgroundColor: ThemeColors.button,

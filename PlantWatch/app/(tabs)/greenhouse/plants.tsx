@@ -67,6 +67,7 @@ export default function PlantsScreen() {
       pathname: '/greenhouse/plant',
       params: {
         plantData: JSON.stringify(plant),
+        greenhouse_name,
       },
     });
   };
