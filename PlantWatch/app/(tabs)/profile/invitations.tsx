@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Alert, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/themed-view';
@@ -65,7 +65,10 @@ export default function InvitationsScreen() {
         <View style={styles.colActions} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={fetchInvitations} />}
+      >
         {loading ? (
           <ThemedText style={styles.emptyText}>Loading...</ThemedText>
         ) : invitations.length === 0 ? (
@@ -138,6 +141,7 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
   },
   content: {
     padding: width * 0.041,
+    flexGrow: 1,
   },
   emptyText: {
     textAlign: 'center',

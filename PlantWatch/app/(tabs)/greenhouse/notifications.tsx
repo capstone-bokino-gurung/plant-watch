@@ -4,7 +4,7 @@ import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { GreenhouseHeader } from '@/components/greenhouse-header';
 
-export default function SettingsScreen() {
+export default function NotificationsScreen() {
   const { greenhouse_id, greenhouse_name, from } = useLocalSearchParams<{
     greenhouse_id: string;
     greenhouse_name: string;
@@ -18,8 +18,8 @@ export default function SettingsScreen() {
       <GreenhouseHeader
         greenhouse_id={greenhouse_id}
         greenhouse_name={greenhouse_name}
-        currentPage="settings"
-        pageTitle="Settings"
+        currentPage="notifications"
+        pageTitle="Notifications"
       />
 
       <View style={styles.content}>

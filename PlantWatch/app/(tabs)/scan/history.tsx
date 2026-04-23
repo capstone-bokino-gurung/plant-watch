@@ -71,7 +71,7 @@ export default function HistoryScreen() {
       genus: scan.genus,
       family: scan.family,
       confidenceScore: String(scan.confidence_score),
-      description: 'No description available.',
+      description: scan.notes || 'No description available.',
     };
     router.push({
       pathname: '/scan/results',

@@ -18,7 +18,21 @@ export default function ActivityLogLayout() {
       />
       <Stack.Screen
         name="select-plants"
-        options={{ 
+        options={{
+          headerShown: false,
+          animation: 'fade'
+        }}
+      />
+      <Stack.Screen
+        name="new-activity-type"
+        options={{
+          headerShown: false,
+          animation: 'fade'
+        }}
+      />
+      <Stack.Screen
+        name="edit-logs"
+        options={{
           headerShown: false,
           animation: 'fade'
         }}

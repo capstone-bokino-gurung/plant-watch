@@ -77,6 +77,13 @@ export default function GreenhouseLayout() {
             animation: 'fade',
         }}
       />
+      <Stack.Screen
+        name="notifications"
+        options={{
+            headerShown: false,
+            animation: 'fade',
+        }}
+      />
     </Stack>
     </GreenhouseRoleProvider>
   );

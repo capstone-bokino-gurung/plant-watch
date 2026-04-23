@@ -36,10 +36,10 @@ export default function ActivityLogScreen() {
         <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/greenhouse/activity-log/log-activity', params: { greenhouse_id, greenhouse_name } })}>
           <ThemedText style={styles.buttonText}>Log Activity</ThemedText>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/greenhouse/activity-log/new-activity-type', params: { greenhouse_id, greenhouse_name } })}>
           <ThemedText style={styles.buttonText}>Create New Activity Type</ThemedText>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/greenhouse/activity-log/edit-logs', params: { greenhouse_id, greenhouse_name } })}>
           <ThemedText style={styles.buttonText}>Edit Existing Logs</ThemedText>
         </TouchableOpacity>
       </View>
