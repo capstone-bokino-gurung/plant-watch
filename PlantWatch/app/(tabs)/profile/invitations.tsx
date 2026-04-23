@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { BackButton } from '@/components/ui/back-button';
 import { ThemeColors } from '@/hooks/get-theme-colors';
-import { getGreenhouseInvites, acceptInvite } from '@/services/user';
+import { getGreenhouseInvites, acceptInvite, rejectInvite } from '@/services/user';
 import { InvitationDisplay } from '@/interfaces/invitation';
 import { InfoModal } from '@/components/modals/info-modal';
 
@@ -46,8 +46,13 @@ export default function InvitationsScreen() {
     }
   }
 
-  function handleDeny(inv: InvitationDisplay) {
-    // TODO: implement deny
+  async function handleDeny(inv: InvitationDisplay) {
+    const result = await rejectInvite(inv.greenhouse_id);
+    if (result?.error) {
+      setErrorMessage(result.error);
+    } else {
+      setInvitations(prev => prev.filter(i => i.greenhouse_id !== inv.greenhouse_id));
+    }
   }
 
   return (

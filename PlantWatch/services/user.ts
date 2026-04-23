@@ -9,7 +9,7 @@ const PERMISSIONS_TABLE = 'permissions';
 export async function getProfileInfo(user_id: string) {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return { error: 'Not authenticated' };
-  
+
   const { data, error } = await supabase
     .rpc('get_user_profile', {
       p_user_id: user_id,
@@ -40,10 +40,10 @@ export async function getGreenhouseInvites(): Promise<{ data?: InvitationDisplay
       getGreenhouse(inv.greenhouse_id),
       getProfileInfo(inv.sender_id),
     ]);
-    
+
     if (greenhouseResult.error || profileResult.error) continue;
     const profile = profileResult.data as ProfileInfo;
-    
+
     results.push({
       greenhouse_id: inv.greenhouse_id,
       greenhouse_name: greenhouseResult.data!.name,
@@ -72,7 +72,7 @@ export async function getRoleId(greenhouse_id: string) {
 export async function acceptInvite(greenhouse_id: string) {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return { error: 'Not authenticated' };
-  
+
   const { error } = await supabase
     .rpc('accept_greenhouse_invite', {
       p_greenhouse_id: greenhouse_id,
@@ -82,9 +82,29 @@ export async function acceptInvite(greenhouse_id: string) {
 }
 
 export async function rejectInvite(greenhouse_id: string) {
-  
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from(INVITE_TABLE)
+    .delete()
+    .eq('greenhouse_id', greenhouse_id)
+    .eq('receiver_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
 }
 
 export async function rescindInvite(greenhouse_id: string) {
-  
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from(INVITE_TABLE)
+    .delete()
+    .eq('greenhouse_id', greenhouse_id)
+    .eq('sender_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
 }
