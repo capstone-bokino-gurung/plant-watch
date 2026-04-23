@@ -150,89 +150,129 @@ export function ScanResults({ imageUri, commonName, scientificName, genus, famil
 }
 
 const getStyles = (width: number, height: number) => StyleSheet.create({
-  container: { flex: 1 },
-  contentContainer: { padding: width * 0.051, paddingTop: height * 0.142 },
-  topSection: { flexDirection: 'row', marginBottom: height * 0.028, height: height * 0.213, borderRadius: 12 },
-  image: { width: width * 0.308, height: height * 0.213, borderRadius: 12, marginRight: width * 0.041 },
-  infoRows: { flex: 1, justifyContent: 'space-between' },
-  row: { flex: 1, justifyContent: 'center' },
-  label: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
-  value: { fontSize: 17, fontWeight: '600' },
-  descriptionContainer: { borderRadius: 12, padding: width * 0.046, minHeight: height * 0.178 },
-  descriptionLabel: { fontSize: 13, fontWeight: '600', color: '#888888', marginBottom: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
-  descriptionText: { fontSize: 16, lineHeight: 24, marginBottom: 5 },
-  progressTrack: { width: width * 0.8, height: height * 0.019, borderRadius: height * 0.01, backgroundColor: '#a8d5b5', borderWidth: 1, borderColor: '#000', overflow: 'hidden', marginBottom: 5 },
-  progressFill: { height: '100%', borderRadius: height * 0.01, backgroundColor: ThemeColors.button },
-  addButton: { backgroundColor: ThemeColors.button, padding: height * 0.019, borderRadius: 12, alignItems: 'center', marginTop: height * 0.019, marginBottom: height * 0.047 },
-  addButtonDone: { backgroundColor: '#888' },
-  addButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modal: { borderRadius: 12, padding: width * 0.062, width: '80%' },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: height * 0.019 },
-  emptyText: { color: '#999', textAlign: 'center', marginBottom: 12 },
-  greenhouseItem: { padding: height * 0.0166, borderRadius: 8, backgroundColor: ThemeColors.inputBackground, marginBottom: height * 0.009 },
-  greenhouseItemText: { fontSize: 16 },
-  cancelText: { textAlign: 'center', marginTop: height * 0.009, color: '#999', fontSize: 14 },
+  container: {
+    flex: 1,
+  },
+  contentContainer: {
+    padding: width * 0.051,
+    paddingTop: height * 0.142,
+  },
+  topSection: {
+    flexDirection: 'row',
+    marginBottom: height * 0.028,
+    height: height * 0.213,
+    borderRadius: 12,
+  },
+  image: {
+    width: width * 0.308,
+    height: height * 0.213,
+    borderRadius: 12,
+    marginRight: width * 0.041,
+  },
+  infoRows: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  row: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#888888',
+    marginBottom: 3,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  value: {
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  descriptionContainer: {
+    borderRadius: 12,
+    padding: width * 0.046,
+    minHeight: height * 0.178,
+  },
+  descriptionLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#888888',
+    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  descriptionText: {
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 5,
+  },
+  progressTrack: {
+    width: width * 0.8,
+    height: height * 0.019,
+    borderRadius: height * 0.01,
+    backgroundColor: '#a8d5b5',
+    borderWidth: 1,
+    borderColor: '#000',
+    overflow: 'hidden',
+    marginBottom: 5,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: height * 0.01,
+    backgroundColor: ThemeColors.button,
+  },
+  addButton: {
+    backgroundColor: ThemeColors.button,
+    padding: height * 0.019,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: height * 0.019,
+    marginBottom: height * 0.047,
+  },
+  addButtonDone: {
+    backgroundColor: '#888',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modal: {
+    borderRadius: 12,
+    padding: width * 0.062,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: height * 0.019,
+  },
+  emptyText: {
+    color: '#999',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  greenhouseItem: {
+    padding: height * 0.0166,
+    borderRadius: 8,
+    backgroundColor: ThemeColors.inputBackground,
+    marginBottom: height * 0.009,
+  },
+  greenhouseItemText: {
+    fontSize: 16,
+  },
+  cancelText: {
+    textAlign: 'center',
+    marginTop: height * 0.009,
+    color: '#999',
+    fontSize: 14,
+  },
 });
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#000000',
-//   },
-//   contentContainer: {
-//     padding: 20,
-//     paddingTop: 120,
-//   },
-//   topSection: {
-//     flexDirection: 'row',
-//     marginBottom: 24,
-//     height: 180,
-//     borderRadius: 12
-//   },
-//   image: {
-//     width: 120,
-//     height: 180,
-//     borderRadius: 12,
-//     marginRight: 16,
-//   },
-//   infoRows: {
-//     flex: 1,
-//     justifyContent: 'space-between',
-//   },
-//   row: {
-//     flex: 1,
-//     justifyContent: 'center',
-//   },
-//   label: {
-//     fontSize: 13,
-//     fontWeight: '600',
-//     color: '#888888',
-//     marginBottom: 3,
-//     textTransform: 'uppercase',
-//     letterSpacing: 0.5,
-//   },
-//   value: {
-//     fontSize: 17,
-//     fontWeight: '600',
-//     color: '#000000',
-//   },
-//   descriptionContainer: {
-//     borderRadius: 12,
-//     padding: 18,
-//     minHeight: 150,
-//   },
-//   descriptionLabel: {
-//     fontSize: 13,
-//     fontWeight: '600',
-//     color: '#888888',
-//     marginBottom: 2,
-//     textTransform: 'uppercase',
-//     letterSpacing: 0.5,
-//   },
-//   descriptionText: {
-//     fontSize: 16,
-//     lineHeight: 24,
-//     marginBottom: 5
-//   },
-// });</View>

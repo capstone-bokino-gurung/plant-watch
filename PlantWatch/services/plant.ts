@@ -238,6 +238,7 @@ export async function logScan(uri: string, scan: PlantScanResult) {
             family: scan.family,
             scientific_name: scan.scientificName,
             confidence_score: Number(scan.confidenceScore),
+            notes: scan.description
         })
         .select().single();
 
