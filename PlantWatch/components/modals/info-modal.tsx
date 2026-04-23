@@ -7,9 +7,10 @@ interface InfoModalProps {
   message: string;
   onClose: () => void;
   title?: string;
+  confirmLabel?: string;
 }
 
-export function InfoModal({ visible, message, onClose, title = 'Info' }: InfoModalProps) {
+export function InfoModal({ visible, message, onClose, title = 'Info', confirmLabel = 'OK' }: InfoModalProps) {
   const { width, height } = useWindowDimensions();
   const styles = getStyles(width, height);
 
@@ -20,7 +21,7 @@ export function InfoModal({ visible, message, onClose, title = 'Info' }: InfoMod
           <ThemedText style={styles.modalTitle}>{title}</ThemedText>
           <ThemedText style={styles.message}>{message}</ThemedText>
           <TouchableOpacity style={styles.okButton} onPress={onClose}>
-            <ThemedText style={styles.okButtonText}>OK</ThemedText>
+            <ThemedText style={styles.okButtonText}>{confirmLabel}</ThemedText>
           </TouchableOpacity>
         </View>
       </View>

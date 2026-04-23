@@ -17,6 +17,7 @@ import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { getGreenhousePlants, deleteGreenhousePlant } from '@/services/plant';
 import { Plant } from '@/interfaces/plant';
+import { DeleteButton } from '@/components/ui/delete-button';
 
 const MOCK_TEMP = 70;
 const MOCK_HUMIDITY = 65;
@@ -121,9 +122,7 @@ export default function GreenhouseDashboardScreen() {
                   <ThemedText style={styles.plantScientific}>Common Name: {plant.common_name}</ThemedText>
                 ) : null}
               </View>
-              <TouchableOpacity onPress={() => deletePlant(plant.plant_id)} style={styles.deleteButton}>
-                <ThemedText style={styles.deleteText}>🗑</ThemedText>
-              </TouchableOpacity>
+              <DeleteButton onPress={() => deletePlant(plant.plant_id)} />
             </TouchableOpacity>
           ))
         )}
@@ -215,12 +214,6 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     fontStyle: 'italic',
     color: '#666',
     marginTop: 2,
-  },
-  deleteButton: {
-    padding: 8,
-  },
-  deleteText: {
-    fontSize: 20,
   },
   fab: {
     position: 'absolute',

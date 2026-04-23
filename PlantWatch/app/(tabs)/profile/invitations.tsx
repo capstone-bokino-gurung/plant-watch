@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Alert, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,17 +7,20 @@ import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { BackButton } from '@/components/ui/back-button';
 import { ThemeColors } from '@/hooks/get-theme-colors';
-import { getGreenhouseInvites } from '@/services/user';
+import { getGreenhouseInvites, acceptInvite } from '@/services/user';
 import { InvitationDisplay } from '@/interfaces/invitation';
+import { InfoModal } from '@/components/modals/info-modal';
 
 export default function InvitationsScreen() {
   const router = useRouter();
+  const { from } = useLocalSearchParams<{ from?: string }>();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const styles = getStyles(width, height);
 
   const [invitations, setInvitations] = useState<InvitationDisplay[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useFocusEffect(useCallback(() => {
     fetchInvitations();
@@ -34,8 +37,13 @@ export default function InvitationsScreen() {
     setLoading(false);
   }
 
-  function handleAccept(inv: InvitationDisplay) {
-    // TODO: implement accept
+  async function handleAccept(inv: InvitationDisplay) {
+    const result = await acceptInvite(inv.greenhouse_id);
+    if (result?.error) {
+      setErrorMessage(typeof result.error === 'string' ? result.error : result.error.message);
+    } else {
+      setInvitations(prev => prev.filter(i => i.greenhouse_id !== inv.greenhouse_id));
+    }
   }
 
   function handleDeny(inv: InvitationDisplay) {
@@ -45,7 +53,7 @@ export default function InvitationsScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <BackButton onPress={() => router.back()} floating={false} />
+        <BackButton onPress={() => from === 'profile' ? router.back() : router.navigate('/(tabs)/profile')} floating={false} />
         <ThemedText style={styles.headerTitle}>Invitations</ThemedText>
         <View style={styles.headerSpacer} />
       </View>
@@ -84,6 +92,13 @@ export default function InvitationsScreen() {
           ))
         )}
       </ScrollView>
+      <InfoModal
+        visible={!!errorMessage}
+        title="Error"
+        message={errorMessage ?? ''}
+        confirmLabel="Acknowledge"
+        onClose={() => setErrorMessage(null)}
+      />
     </ThemedView>
   );
 }

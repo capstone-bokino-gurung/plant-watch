@@ -26,6 +26,9 @@ const MAPPING = {
   'arrow.right.arrow.left': 'swap-horiz',
   'arrowtriangle.up.fill': 'arrow-drop-up',
   'arrowtriangle.down.fill': 'arrow-drop-down',
+  'trash': 'delete',
+  'gear': 'settings',
+  'envelope.fill': 'email'
 } as IconMapping;
 
 /**

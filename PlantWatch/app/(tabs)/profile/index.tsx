@@ -6,11 +6,14 @@ import { ThemedView } from '@/components/themed-view';
 import { BackButton } from '@/components/ui/back-button';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'expo-router';
 import { useState } from "react";
 import { Image, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 
 export default function Profile() {
   const { session, user, loading, signOut } = useAuth();
+  const router = useRouter();
   const { width, height } = useWindowDimensions();
   const styles = getStyles(width, height);
   const screens = {
@@ -58,6 +61,17 @@ export default function Profile() {
           <ThemedText style={styles.name}>{firstName} {lastName}</ThemedText>
           <ThemedText style={styles.email}>{user?.email}</ThemedText>
         </View>
+        <View style={styles.menuList}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/profile/account')}>
+            <IconSymbol name="gear" size={20} color={ThemeColors.text} />
+            <ThemedText style={styles.menuItemText}>Account Information</ThemedText>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push({ pathname: '/profile/invitations', params: { from: 'profile' } })}>
+            <IconSymbol name="envelope.fill" size={20} color={ThemeColors.text} />
+            <ThemedText style={styles.menuItemText}>Invitations</ThemedText>
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity style={styles.loginButton} onPress={signOut} disabled={loading}>
           <ThemedText style={styles.loginButtonText}>Sign Out</ThemedText>
         </TouchableOpacity>
@@ -118,5 +132,26 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  menuList: {
+    width: '80%',
+    alignSelf: 'center',
+    marginBottom: height * 0.02,
+    gap: 10,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: height * 0.019,
+    paddingHorizontal: width * 0.051,
+    backgroundColor: ThemeColors.inputBackground,
+    borderRadius: 12,
+  },
+  menuItemText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '700',
+    color: ThemeColors.text,
   },
 });

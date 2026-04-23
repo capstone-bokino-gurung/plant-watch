@@ -1,8 +1,11 @@
 import { Stack } from 'expo-router';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ScanLayout() {
+  const { session } = useAuth();
+
   return (
-    <Stack>
+    <Stack key={session?.user.id ?? 'unauthenticated'}>
       <Stack.Screen 
         name="index" 
         options={{ 

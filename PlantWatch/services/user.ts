@@ -45,6 +45,7 @@ export async function getGreenhouseInvites(): Promise<{ data?: InvitationDisplay
     const profile = profileResult.data as ProfileInfo;
     
     results.push({
+      greenhouse_id: inv.greenhouse_id,
       greenhouse_name: greenhouseResult.data!.name,
       sender_id: inv.sender_id,
       sender_name: `${profile.first_name} ${profile.last_name}`,
@@ -69,7 +70,15 @@ export async function getRoleId(greenhouse_id: string) {
 }
 
 export async function acceptInvite(greenhouse_id: string) {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: 'Not authenticated' };
   
+  const { error } = await supabase
+    .rpc('accept_greenhouse_invite', {
+      p_greenhouse_id: greenhouse_id,
+    });
+
+  if (error) return { error: error }
 }
 
 export async function rejectInvite(greenhouse_id: string) {

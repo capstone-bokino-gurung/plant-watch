@@ -4,6 +4,15 @@ import { Role } from 'react-native';
 
 const ROLE_TABLE = 'role_groups';
 
+export async function getRoleGroup(role_id: string) {
+  const { data, error } = await supabase
+    .from(ROLE_TABLE)
+    .select('*')
+    .eq('role_id', role_id)
+    .single();
+  return { data: data as RoleGroup | null, error };
+}
+
 export async function getRoleGroups(greenhouse_id: string) {
   const { data, error } = await supabase
     .from(ROLE_TABLE)

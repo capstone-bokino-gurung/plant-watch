@@ -3,6 +3,7 @@ import { User } from '@/interfaces/user';
 import { supabase } from '@/util/supabase';
 
 const INVITE_TABLE = 'invitations';
+const PERMISSION_TABLE = 'permissions';
 
 export async function createGreenhouse(greenhouseName: string) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -12,7 +13,7 @@ export async function createGreenhouse(greenhouseName: string) {
     // Check for duplicates WITHOUT using a join
     // First get all user's greenhouse IDs
     const { data: userPermissions, error: permError } = await supabase
-        .from('permissions')
+        .from(PERMISSION_TABLE)
         .select('greenhouse_id')
         .eq('user_id', userId);
 
@@ -52,7 +53,7 @@ export async function getUserGreenhouses() {
     if (authError || !user) return { error: 'Not authenticated' };
 
     const { data, error } = await supabase
-        .from('permissions')
+        .from(PERMISSION_TABLE)
         .select('greenhouses(greenhouse_id, name, created_at)')
         .eq('user_id', user.id);
     console.log(error);
@@ -76,18 +77,24 @@ export async function getGreenhouse(greenhouse_id: string) {
 
 export async function getGreenhouseUsers(greenhouse_id: string) {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) return { error: 'Not authenticated' };
+  if (authError || !user) return { error: 'Not authenticated' };
 
-    const { data, error } = await supabase
-        .from('permissions')
-        .select('role_id, users(user_id, first_name, last_name, email, avatar_url, private, created_at)')
-        .eq('greenhouse_id', greenhouse_id);
+  const { data, error } = await supabase
+    .from(PERMISSION_TABLE)
+    .select('user_id, role_id')
+    .eq('greenhouse_id', greenhouse_id);
 
-    if (error) return { error: 'There was an error retrieving your greenhouses from our database. Please try again later.'};
+  if (error) return { error: 'There was an error retrieving users from our database. Please try again later.' };
 
-    const users = data?.map(item => ({ ...(item.users as unknown as User), role_id: item.role_id })).filter(Boolean) || [];
+  const users: User[] = [];
+  for (const perm of data || []) {
+    const { data: profile } = await supabase.rpc('get_user_profile', { p_user_id: perm.user_id });
+    const p = Array.isArray(profile) ? profile[0] : profile;
+    if (!p) continue;
+    users.push({ ...p, user_id: perm.user_id, role_id: perm.role_id } as User);
+  }
 
-    return { data: users};
+  return { data: users };
 }
 
 export async function deleteGreenhouse(greenhouse_id: string) {
@@ -109,4 +116,13 @@ export async function inviteUser(greenhouse_id: string, email: string): Promise<
   if (error) return { error: error.message };
   if (data === false) return { error: 'User not found, already invited, or account is private.' };
   return {};
+}
+
+export async function updateRoleGroup(greenhouse_id: string, user_id: string, role_id: string) {
+  const { error } = await supabase
+    .from(PERMISSION_TABLE)
+    .update({ role_id })
+    .eq('greenhouse_id', greenhouse_id)
+    .eq('user_id', user_id);
+  return { error };
 }

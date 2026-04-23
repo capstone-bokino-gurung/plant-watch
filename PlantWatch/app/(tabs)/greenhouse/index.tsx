@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createGreenhouse, deleteGreenhouse, getUserGreenhouses } from '@/services/greenhouse';
+import { DeleteButton } from '@/components/ui/delete-button';
 import { Greenhouse } from '@/interfaces/greenhouse';
 
 export default function GreenhouseScreen() {
@@ -108,9 +109,7 @@ export default function GreenhouseScreen() {
                                     <ThemedText style={styles.greenhouseName}>{g.name}</ThemedText>
                                     <ThemedText style={styles.greenhouseArrow}>→</ThemedText>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => deleteGreenhouseReact(g.greenhouse_id)} style={styles.deleteButton}>
-                                    <ThemedText style={styles.deleteText}>🗑</ThemedText>
-                                </TouchableOpacity>
+                                <DeleteButton onPress={() => deleteGreenhouseReact(g.greenhouse_id)} style={{ marginLeft: 8 }} />
                             </View>)
                         }
                     )
@@ -125,10 +124,10 @@ export default function GreenhouseScreen() {
                     <ThemedText style={styles.invitesButtonText}>View Invites</ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={styles.fab}
+                    style={styles.createFab}
                     onPress={() => setCreateModalOpen(true)}
                 >
-                    <ThemedText style={styles.fabText}>+</ThemedText>
+                    <ThemedText style={styles.createFabText}>+</ThemedText>
                 </TouchableOpacity>
             </View>
 
@@ -224,13 +223,6 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     fontSize: 18,
     color: '#2d6a4f',
   },
-  deleteButton: {
-    padding: 8,
-    marginLeft: 8,
-  },
-  deleteText: {
-    fontSize: 20,
-  },
   bottomRow: {
     position: 'absolute',
     left: width * 0.062,
@@ -253,7 +245,7 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  fab: {
+  createFab: {
     width: width * 0.12,
     height: width * 0.12,
     borderRadius: width * 0.072,
@@ -262,7 +254,7 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     justifyContent: 'center',
     elevation: 4,
   },
-  fabText: {
+  createFabText: {
     color: '#fff',
     fontSize: 32,
     lineHeight: 36,

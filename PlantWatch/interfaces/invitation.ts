@@ -6,6 +6,7 @@ export interface Invitation {
 }
 
 export interface InvitationDisplay {
+  greenhouse_id: string;
   greenhouse_name: string;
   sender_id: string;
   sender_name: string; // first_name + ' ' + last_name

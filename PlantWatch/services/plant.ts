@@ -7,7 +7,7 @@ const DESC_ENDPOINT = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/getP
 const SCAN_HISTORY_TABLE = 'scan_history';
 const PLANT_TABLE = 'plants'
 export const PLANT_IMG_BUCKET = 'plant_images';
-const SCAN_LIMIT = 1;
+const SCAN_LIMIT = 8;
 
 // Return plant's openAI description (string)
 export async function getDescription(commonName: string) {

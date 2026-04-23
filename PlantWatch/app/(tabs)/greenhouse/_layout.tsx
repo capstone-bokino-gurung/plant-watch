@@ -1,8 +1,14 @@
-import { Stack } from 'expo-router';
+import { Stack, useGlobalSearchParams } from 'expo-router';
+import { GreenhouseRoleProvider } from '@/contexts/greenhouse-role-context';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function GreenhouseLayout() {
+  const { greenhouse_id } = useGlobalSearchParams<{ greenhouse_id: string }>();
+  const { session } = useAuth();
+
   return (
-    <Stack>
+    <GreenhouseRoleProvider greenhouse_id={greenhouse_id ?? ''}>
+    <Stack key={session?.user.id ?? 'unauthenticated'}>
       <Stack.Screen 
         name="index" 
         options={{ 
@@ -71,13 +77,7 @@ export default function GreenhouseLayout() {
             animation: 'fade',
         }}
       />
-      {/* <Stack.Screen
-        name="activity-log"
-        options={{
-            headerShown: false,
-            animation: 'fade',
-        }}
-      /> */}
     </Stack>
+    </GreenhouseRoleProvider>
   );
 }

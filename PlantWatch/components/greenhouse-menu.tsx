@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemeColors } from '@/hooks/get-theme-colors';
+import { useGreenhouseRole } from '@/contexts/greenhouse-role-context';
 
 export type GreenhousePage =
   | 'dashboard'
@@ -30,13 +31,13 @@ interface GreenhouseMenuProps {
   currentPage: GreenhousePage;
 }
 
-const MENU_ITEMS: { label: string; page: GreenhousePage; pathname: string }[] = [
+const MENU_ITEMS: { label: string; page: GreenhousePage; pathname: string; ownerOnly?: boolean }[] = [
   { label: 'Dashboard',     page: 'dashboard',     pathname: '/greenhouse/dashboard' },
   { label: 'Plants',        page: 'plants',        pathname: '/greenhouse/plants' },
   { label: 'Devices',       page: 'devices',       pathname: '/greenhouse/devices' },
-  { label: 'Activity Log',       page: 'activity-log',  pathname: '/greenhouse/activity-log' },
-  { label: 'Users',         page: 'users',         pathname: '/greenhouse/users' },
-  { label: 'User Roles',    page: 'userRoles',     pathname: '/greenhouse/user-roles' },
+  { label: 'Activity Log',  page: 'activity-log',  pathname: '/greenhouse/activity-log' },
+  { label: 'Users',         page: 'users',         pathname: '/greenhouse/users',      ownerOnly: true },
+  { label: 'User Roles',    page: 'userRoles',     pathname: '/greenhouse/user-roles', ownerOnly: true },
   { label: 'Notifications', page: 'notifications', pathname: '/greenhouse/notifications' },
   { label: 'Settings',      page: 'settings',      pathname: '/greenhouse/settings' },
 ];
@@ -46,6 +47,8 @@ export function GreenhouseMenu({ greenhouse_id, greenhouse_name, currentPage }: 
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const styles = getStyles(width);
+  const { role } = useGreenhouseRole();
+  const visibleItems = MENU_ITEMS.filter(item => !item.ownerOnly || role?.owner);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuAnim = useRef(new Animated.Value(-width * 0.70)).current;
@@ -93,7 +96,7 @@ export function GreenhouseMenu({ greenhouse_id, greenhouse_name, currentPage }: 
               </TouchableOpacity>
             </View>
 
-            {MENU_ITEMS.map(item => (
+            {visibleItems.map(item => (
               <TouchableOpacity
                 key={item.page}
                 style={styles.menuItem}

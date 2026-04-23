@@ -16,6 +16,8 @@ import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { getGreenhousePlants, deleteGreenhousePlant } from '@/services/plant';
 import { Plant } from '@/interfaces/plant';
+import { useGreenhouseRole } from '@/contexts/greenhouse-role-context';
+import { DeleteButton } from '@/components/ui/delete-button';
 
 export default function PlantsScreen() {
   const router = useRouter();
@@ -26,6 +28,8 @@ export default function PlantsScreen() {
     greenhouse_id: string;
     greenhouse_name: string;
   }>();
+
+  const { role } = useGreenhouseRole();
 
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,6 +89,8 @@ export default function PlantsScreen() {
         <ThemedText style={styles.sectionLabel}>PLANTS ({plants.length})</ThemedText>
         {loading ? (
           <ThemedText style={styles.emptyText}>Loading...</ThemedText>
+        ) : !role?.view_plants ? (
+          <ThemedText style={styles.emptyText}>You don't have permission to view plants.</ThemedText>
         ) : plants.length === 0 ? (
           <ThemedText style={styles.emptyText}>No plants added yet.</ThemedText>
         ) : (
@@ -96,18 +102,19 @@ export default function PlantsScreen() {
                   <ThemedText style={styles.plantScientific}>Common Name: {plant.common_name}</ThemedText>
                 ) : null}
               </View>
-              <TouchableOpacity onPress={() => deletePlant(plant.plant_id)} style={styles.deleteButton}>
-                <ThemedText style={styles.deleteText}>🗑</ThemedText>
-              </TouchableOpacity>
+              {role?.delete_plants || role?.owner && (
+                <DeleteButton onPress={() => deletePlant(plant.plant_id)} style={{ marginLeft: 8 }} />
+              )}
             </TouchableOpacity>
           ))
         )}
       </ScrollView>
 
-      {/* Floating Add Button */}
-      <TouchableOpacity style={[styles.fab, { bottom: insets.bottom + 24 }]} onPress={() => setAddModalOpen(true)}>
-        <ThemedText style={styles.fabText}>+</ThemedText>
-      </TouchableOpacity>
+      {(role?.create_plants || role?.owner) && (
+        <TouchableOpacity style={[styles.fab, { bottom: insets.bottom + 24 }]} onPress={() => setAddModalOpen(true)}>
+          <ThemedText style={styles.fabText}>+</ThemedText>
+        </TouchableOpacity>
+      )}
 
       <AddPlant
         visible={addModalOpen}
@@ -160,12 +167,6 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     fontStyle: 'italic',
     color: '#666',
     marginTop: 2,
-  },
-  deleteButton: {
-    padding: 8,
-  },
-  deleteText: {
-    fontSize: 20,
   },
   fab: {
     position: 'absolute',

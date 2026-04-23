@@ -11,6 +11,7 @@ import { Plant } from '@/interfaces/plant';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { AddPlant } from '@/components/modals/add-plant';
+import { useGreenhouseRole } from '@/contexts/greenhouse-role-context';
 
 
 type Greenhouse = { greenhouse_id: string; name: string };
@@ -21,6 +22,8 @@ type LinkedDevice = { id: string; name: string; type: string };
 export default function PlantScreen() {
   const { plantData, greenhouse_name } = useLocalSearchParams<{ plantData: string; greenhouse_name: string }>();
   const initialPlant: Plant | null = plantData ? JSON.parse(plantData) : null;
+
+  const { role } = useGreenhouseRole();
 
   const [currentPlant, setCurrentPlant] = useState<Plant | null>(initialPlant);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -77,7 +80,7 @@ export default function PlantScreen() {
         currentPage="plants"
         pageTitle={`Plants / ${label}`}
         leftButton="back"
-        onEdit={() => setEditModalOpen(true)}
+        onEdit={(role?.edit_plants || role?.owner) ? () => setEditModalOpen(true) : undefined}
       />
 
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>

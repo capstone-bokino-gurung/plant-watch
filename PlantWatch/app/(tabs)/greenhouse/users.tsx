@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useFocusEffect, useLocalSearchParams, Stack } from 'expo-router';
 import { InviteUser } from '@/components/modals/invite-user';
+import { InfoModal } from '@/components/modals/info-modal';
 import {
   Alert,
   ScrollView,
@@ -15,7 +16,7 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { ThemeColors } from '@/hooks/get-theme-colors';
-import { getGreenhouseUsers } from '@/services/greenhouse';
+import { getGreenhouseUsers, updateRoleGroup } from '@/services/greenhouse';
 import { getRoleGroups } from '@/services/role_groups';
 import { User } from '@/interfaces/user';
 import { RoleGroup } from '@/interfaces/role_group';
@@ -31,10 +32,51 @@ export default function UsersScreen() {
   }>();
 
   const [users, setUsers] = useState<User[]>([]);
+  const [editedUsers, setEditedUsers] = useState<User[]>([]);
   const [roleGroups, setRoleGroups] = useState<RoleGroup[]>([]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [infoModal, setInfoModal] = useState<{ title: string; message: string } | null>(null);
+
+  function handleEnterEdit() {
+    setEditedUsers([...users]);
+    setEditMode(true);
+  }
+
+  function handleCancel() {
+    setEditMode(false);
+    setOpenDropdown(null);
+  }
+
+  function handleRoleChange(userId: string, roleId: string) {
+    setEditedUsers(prev => prev.map(u => u.user_id === userId ? { ...u, role_id: roleId } : u));
+    setOpenDropdown(null);
+  }
+
+  async function handleSave() {
+    const hasOwner = editedUsers.some(u => roleGroups.find(r => r.role_id === u.role_id)?.name === 'Owner');
+    if (!hasOwner) {
+      setInfoModal({ title: 'Error', message: 'There must be at least one owner in the greenhouse.' });
+      return;
+    }
+    setSaving(true);
+    for (const user of editedUsers) {
+      const { error } = await updateRoleGroup(greenhouse_id, user.user_id, user.role_id);
+      if (error) {
+        setInfoModal({ title: 'Error', message: 'Failed to update role for ' + user.first_name });
+        setSaving(false);
+        return;
+      }
+    }
+    setUsers(editedUsers);
+    setEditMode(false);
+    setOpenDropdown(null);
+    setSaving(false);
+    setInfoModal({ title: 'Success', message: 'Roles saved successfully.' });
+  }
 
   useFocusEffect(useCallback(() => {
     if (greenhouse_id) fetchData();
@@ -56,6 +98,7 @@ export default function UsersScreen() {
     } else {
       setRoleGroups(rolesResult.data || []);
     }
+    console.log(usersResult);
     setLoading(false);
   }
 
@@ -68,6 +111,7 @@ export default function UsersScreen() {
         greenhouse_name={greenhouse_name}
         currentPage="users"
         pageTitle="Users"
+        onEdit={editMode ? undefined : handleEnterEdit}
       />
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -77,6 +121,7 @@ export default function UsersScreen() {
           <ThemedText style={styles.emptyText}>No users found.</ThemedText>
         ) : (
           users.map(user => {
+            const editedUser = editedUsers.find(u => u.user_id === user.user_id) ?? user;
             const isOpen = openDropdown === user.user_id;
             return (
               <View key={user.user_id} style={styles.userCard}>
@@ -87,58 +132,80 @@ export default function UsersScreen() {
                   <ThemedText style={styles.userEmail}>{user.email}</ThemedText>
                 </View>
 
-                <View style={styles.dropdownContainer}>
-                  <TouchableOpacity
-                    style={styles.dropdownTrigger}
-                    onPress={() => setOpenDropdown(isOpen ? null : user.user_id)}
-                    activeOpacity={0.8}
-                  >
-                    <ThemedText style={styles.dropdownTriggerText} numberOfLines={1}>
-                      {roleGroups.find(r => r.role_id === user.role_id)?.name ?? 'No role'}
-                    </ThemedText>
-                    <IconSymbol name={isOpen ? 'arrowtriangle.up.fill' : 'arrowtriangle.down.fill'} size={8} color="#888" />
-                  </TouchableOpacity>
+                {editMode ? (
+                  <View style={styles.dropdownContainer}>
+                    <TouchableOpacity
+                      style={styles.dropdownTrigger}
+                      onPress={() => setOpenDropdown(isOpen ? null : user.user_id)}
+                      activeOpacity={0.8}
+                    >
+                      <ThemedText style={styles.dropdownTriggerText} numberOfLines={1}>
+                        {roleGroups.find(r => r.role_id === editedUser.role_id)?.name ?? 'No role'}
+                      </ThemedText>
+                      <IconSymbol name={isOpen ? 'arrowtriangle.up.fill' : 'arrowtriangle.down.fill'} size={8} color="#888" />
+                    </TouchableOpacity>
 
-                  {isOpen && (
-                    <View style={styles.dropdownList}>
-                      {roleGroups.length === 0 ? (
-                        <View style={styles.dropdownItem}>
-                          <ThemedText style={styles.dropdownItemText}>No role groups</ThemedText>
-                        </View>
-                      ) : (
-                        // Makes the user's current role go on top
-                        [...roleGroups].sort((a, b) => {
-                          if (a.role_id === user.role_id) return -1;
-                          if (b.role_id === user.role_id) return 1;
-                          return 0;
-                        }).map(role => (
-                          <TouchableOpacity
-                            key={role.role_id}
-                            style={styles.dropdownItem}
-                            onPress={() => setOpenDropdown(null)}
-                          >
-                            <ThemedText style={styles.dropdownItemText}>{role.name}</ThemedText>
-                          </TouchableOpacity>
-                        ))
-                      )}
-                    </View>
-                  )}
-                </View>
+                    {isOpen && (
+                      <View style={styles.dropdownList}>
+                        {roleGroups.length === 0 ? (
+                          <View style={styles.dropdownItem}>
+                            <ThemedText style={styles.dropdownItemText}>No role groups</ThemedText>
+                          </View>
+                        ) : (
+                          [...roleGroups].sort((a, b) => {
+                            if (a.role_id === editedUser.role_id) return -1;
+                            if (b.role_id === editedUser.role_id) return 1;
+                            return 0;
+                          }).map(role => (
+                            <TouchableOpacity
+                              key={role.role_id}
+                              style={styles.dropdownItem}
+                              onPress={() => handleRoleChange(user.user_id, role.role_id)}
+                            >
+                              <ThemedText style={styles.dropdownItemText}>{role.name}</ThemedText>
+                            </TouchableOpacity>
+                          ))
+                        )}
+                      </View>
+                    )}
+                  </View>
+                ) : (
+                  <ThemedText style={styles.roleText}>
+                    {roleGroups.find(r => r.role_id === user.role_id)?.name ?? 'No role'}
+                  </ThemedText>
+                )}
               </View>
             );
           })
         )}
       </ScrollView>
 
-      <View style={[styles.footer]}>
-        <TouchableOpacity style={styles.inviteButton} onPress={() => setInviteModalOpen(true)}>
-          <ThemedText style={styles.inviteButtonText}>Invite User +</ThemedText>
-        </TouchableOpacity>
+      <View style={styles.footer}>
+        {editMode ? (
+          <View style={styles.actionRow}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleSave} disabled={saving}>
+              <ThemedText style={styles.actionButtonText}>{saving ? 'Saving...' : 'Save Roles'}</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.actionButton, styles.cancelButton]} onPress={handleCancel} disabled={saving}>
+              <ThemedText style={styles.actionButtonText}>Cancel</ThemedText>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity style={styles.inviteButton} onPress={() => setInviteModalOpen(true)}>
+            <ThemedText style={styles.inviteButtonText}>Invite User +</ThemedText>
+          </TouchableOpacity>
+        )}
       </View>
       <InviteUser
         visible={inviteModalOpen}
         greenhouseId={greenhouse_id}
         onClose={() => setInviteModalOpen(false)}
+      />
+      <InfoModal
+        visible={!!infoModal}
+        title={infoModal?.title}
+        message={infoModal?.message ?? ''}
+        onClose={() => setInfoModal(null)}
       />
     </ThemedView>
   );
@@ -240,6 +307,34 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     alignItems: 'center',
   },
   inviteButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  roleText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#444',
+  },
+  saveButton: {
+    marginBottom: 10,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: width * 0.03,
+  },
+  actionButton: {
+    width: '40%',
+    backgroundColor: ThemeColors.button,
+    borderRadius: 12,
+    paddingVertical: height * 0.019,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: ThemeColors.denyRed,
+  },
+  actionButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',

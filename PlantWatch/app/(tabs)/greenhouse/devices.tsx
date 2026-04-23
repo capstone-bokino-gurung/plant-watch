@@ -16,6 +16,8 @@ import { GreenhouseHeader } from '@/components/greenhouse-header';
 import { ThemeColors } from '@/hooks/get-theme-colors';
 import { getDevices, deleteDevice } from '@/services/device';
 import { Device } from '@/interfaces/device';
+import { DeleteButton } from '@/components/ui/delete-button';
+import { useGreenhouseRole } from '@/contexts/greenhouse-role-context';
 
 export default function DevicesScreen() {
   const router = useRouter();
@@ -26,6 +28,8 @@ export default function DevicesScreen() {
     greenhouse_id: string;
     greenhouse_name: string;
   }>();
+
+  const { role } = useGreenhouseRole();
 
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,6 +90,8 @@ export default function DevicesScreen() {
         <ThemedText style={styles.sectionLabel}>DEVICES ({devices.length})</ThemedText>
         {loading ? (
           <ThemedText style={styles.emptyText}>Loading...</ThemedText>
+        ) : !role?.view_devices ? (
+          <ThemedText style={styles.emptyText}>You don't have permission to view devices.</ThemedText>
         ) : devices.length === 0 ? (
           <ThemedText style={styles.emptyText}>No devices added yet.</ThemedText>
         ) : (
@@ -99,21 +105,22 @@ export default function DevicesScreen() {
                 <ThemedText style={styles.deviceName}>{device.name}</ThemedText>
                 <ThemedText style={styles.deviceType}>{device.type}</ThemedText>
               </View>
-              <TouchableOpacity onPress={() => handleDelete(device.device_id)} style={styles.deleteButton}>
-                <ThemedText style={styles.deleteText}>🗑</ThemedText>
-              </TouchableOpacity>
+              {(role?.delete_devices || role?.owner) && (
+                <DeleteButton onPress={() => handleDelete(device.device_id)} />
+              )}
             </TouchableOpacity>
           ))
         )}
       </ScrollView>
 
-      {/* Floating Add Button */}
-      <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + 24 }]}
-        onPress={() => setAddModalOpen(true)}
-      >
-        <ThemedText style={styles.fabText}>+</ThemedText>
-      </TouchableOpacity>
+      {(role?.create_devices || role?.owner) && (
+        <TouchableOpacity
+          style={[styles.fab, { bottom: insets.bottom + 24 }]}
+          onPress={() => setAddModalOpen(true)}
+        >
+          <ThemedText style={styles.fabText}>+</ThemedText>
+        </TouchableOpacity>
+      )}
 
       <AddDevice
         visible={addModalOpen}
@@ -165,12 +172,6 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
     fontSize: 13,
     color: '#666',
     marginTop: 2,
-  },
-  deleteButton: {
-    padding: 8,
-  },
-  deleteText: {
-    fontSize: 20,
   },
   fab: {
     position: 'absolute',
